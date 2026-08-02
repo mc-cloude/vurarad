@@ -1,0 +1,5 @@
+FROM pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime
+WORKDIR /app
+RUN pip install monai[all] google-cloud-bigquery google-cloud-storage pandas db-dtypes
+COPY train_monai_v5.py .
+ENTRYPOINT ["python", "train_monai_v5.py"]

@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+reportlab
+httpx
+python-multipart
+pydantic
+google-cloud-logging
+google-cloud-storage
+google-cloud-pubsub
+cloud-sql-python-connector
+sqlalchemy
+pg8000

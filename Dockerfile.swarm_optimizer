@@ -1,0 +1,5 @@
+FROM python:3.9-slim
+WORKDIR /app
+RUN pip install google-cloud-bigquery google-cloud-storage pandas db-dtypes
+COPY swarm_optimizer.py .
+ENTRYPOINT ["python", "swarm_optimizer.py"]
