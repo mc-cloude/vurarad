@@ -175,12 +175,8 @@ class Settings(BaseSettings):
         # MinIO backend validation
         if self.storage_backend == "minio":
             if not self.minio_endpoint:
-                raise ValueError(
-                    "MINIO_ENDPOINT is required when STORAGE_BACKEND=minio"
-                )
-            if self.is_production and (
-                not self.minio_access_key or not self.minio_secret_key
-            ):
+                raise ValueError("MINIO_ENDPOINT is required when STORAGE_BACKEND=minio")
+            if self.is_production and (not self.minio_access_key or not self.minio_secret_key):
                 raise ValueError(
                     "MINIO_ACCESS_KEY and MINIO_SECRET_KEY are required"
                     " when STORAGE_BACKEND=minio and ENVIRONMENT=production"

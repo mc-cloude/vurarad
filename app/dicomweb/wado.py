@@ -56,9 +56,7 @@ def build_multipart(
     chunks: list[bytes] = []
     for part in parts:
         chunks.append(f"--{boundary}\r\n".encode())
-        chunks.append(
-            f"Content-Type: {content_type}\r\n\r\n".encode()
-        )
+        chunks.append(f"Content-Type: {content_type}\r\n\r\n".encode())
         chunks.append(part)
         chunks.append(b"\r\n")
     chunks.append(f"--{boundary}--\r\n".encode())
@@ -94,7 +92,7 @@ def _negotiate_transfer_syntax(accept: str | None) -> str:
     marker = "transfer-syntax="
     idx = lower.find(marker)
     if idx >= 0:
-        rest = accept[idx + len(marker):]
+        rest = accept[idx + len(marker) :]
         # The UID may be terminated by ; or end of string
         uid = rest.split(";")[0].strip().strip('"').strip("'")
         if uid:
@@ -110,9 +108,7 @@ async def retrieve_study(
 ) -> tuple[bytes, str]:
     """WADO-RS: retrieve all instances in a study as multipart/related."""
     # Query all series in the study, then all instances per series
-    series_list = await store.query_series(
-        study.study_uid, user.tenant_id, 500, None
-    )
+    series_list = await store.query_series(study.study_uid, user.tenant_id, 500, None)
     parts: list[bytes] = []
     for series in series_list:
         series_instances = await store.query_instances(
@@ -135,9 +131,7 @@ async def retrieve_series(
     user: AuthenticatedUser,
 ) -> tuple[bytes, str]:
     """WADO-RS: retrieve all instances in a series."""
-    instances = await store.query_instances(
-        study.study_uid, series_uid, user.tenant_id, 500, None
-    )
+    instances = await store.query_instances(study.study_uid, series_uid, user.tenant_id, 500, None)
     parts: list[bytes] = []
     for inst in instances:
         if inst.object_ref:
@@ -156,9 +150,7 @@ async def retrieve_instance(
     user: AuthenticatedUser,
 ) -> tuple[bytes, str]:
     """WADO-RS: retrieve a single instance."""
-    inst = await store.get_instance(
-        study.study_uid, series_uid, sop_uid, user.tenant_id
-    )
+    inst = await store.get_instance(study.study_uid, series_uid, sop_uid, user.tenant_id)
     if inst is None or not inst.object_ref:
         body, boundary = build_multipart([])
         return body, boundary
@@ -181,9 +173,7 @@ async def retrieve_frames(
     Uses ``ObjectStore.get_range`` to fetch only the needed bytes, not the
     whole object.
     """
-    inst = await store.get_instance(
-        study.study_uid, series_uid, sop_uid, user.tenant_id
-    )
+    inst = await store.get_instance(study.study_uid, series_uid, sop_uid, user.tenant_id)
     if inst is None or not inst.object_ref:
         body, boundary = build_multipart([], content_type="application/octet-stream")
         return body, boundary
@@ -219,9 +209,7 @@ async def retrieve_instance_metadata(
     user: AuthenticatedUser,
 ) -> list[dict[str, Any]]:
     """WADO-RS: return DICOM JSON metadata for a single instance."""
-    inst = await store.get_instance(
-        study.study_uid, series_uid, sop_uid, user.tenant_id
-    )
+    inst = await store.get_instance(study.study_uid, series_uid, sop_uid, user.tenant_id)
     if inst is None:
         return []
     return [json.loads(json.dumps(instance_to_dicom_json(inst)))]

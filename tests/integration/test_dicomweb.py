@@ -116,9 +116,7 @@ class FakeObjectStore:
 
     async def list_prefix(self, prefix: str, limit: int = 1000) -> list[ObjectRef]:
         return [
-            ObjectRef(bucket=self._bucket_name, key=k)
-            for k in self._data
-            if k.startswith(prefix)
+            ObjectRef(bucket=self._bucket_name, key=k) for k in self._data if k.startswith(prefix)
         ][:limit]
 
     async def copy(self, src_key: str, dst_key: str) -> ObjectRef:
@@ -191,9 +189,7 @@ class FakeDicomMetadataStore:
         key = f"{instance.study_uid}_{instance.series_uid}_{instance.sop_uid}"
         self._instances[key] = instance
 
-    async def get_study(
-        self, study_uid: str, tenant_id: str
-    ) -> StudyRecord | None:
+    async def get_study(self, study_uid: str, tenant_id: str) -> StudyRecord | None:
         study = self._studies.get(study_uid)
         if study is None or study.tenant_id != tenant_id:
             return None
@@ -214,9 +210,7 @@ class FakeDicomMetadataStore:
         sop_uid: str,
         tenant_id: str,
     ) -> InstanceRecord | None:
-        inst = self._instances.get(
-            f"{study_uid}_{series_uid}_{sop_uid}"
-        )
+        inst = self._instances.get(f"{study_uid}_{series_uid}_{sop_uid}")
         if inst is None or inst.tenant_id != tenant_id:
             return None
         return inst
@@ -224,16 +218,14 @@ class FakeDicomMetadataStore:
     async def query_studies(
         self, tenant_id: str, limit: int, offset: str | None
     ) -> list[StudyRecord]:
-        return [
-            s for s in self._studies.values()
-            if s.tenant_id == tenant_id
-        ][:limit]
+        return [s for s in self._studies.values() if s.tenant_id == tenant_id][:limit]
 
     async def query_series(
         self, study_uid: str, tenant_id: str, limit: int, offset: str | None
     ) -> list[SeriesRecord]:
         return [
-            s for s in self._series.values()
+            s
+            for s in self._series.values()
             if s.tenant_id == tenant_id and s.study_uid == study_uid
         ][:limit]
 
@@ -246,10 +238,9 @@ class FakeDicomMetadataStore:
         offset: str | None,
     ) -> list[InstanceRecord]:
         return [
-            i for i in self._instances.values()
-            if i.tenant_id == tenant_id
-            and i.study_uid == study_uid
-            and i.series_uid == series_uid
+            i
+            for i in self._instances.values()
+            if i.tenant_id == tenant_id and i.study_uid == study_uid and i.series_uid == series_uid
         ][:limit]
 
 
@@ -323,9 +314,7 @@ def dicomweb_app(
     app.state.dicom_metadata_store = fake_meta
     app.state.audit_object_store = StubAuditStore(locked=True)
     # Seed pixel data in the fake store
-    fake_store._data[
-        f"dicom/{STUDY_UID}/{SERIES_UID}/{SOP_UID}.dcm"
-    ] = _DICOM_BYTES
+    fake_store._data[f"dicom/{STUDY_UID}/{SERIES_UID}/{SOP_UID}.dcm"] = _DICOM_BYTES
     return app
 
 
@@ -354,20 +343,14 @@ def _stow_body(dicom_bytes: bytes, boundary: str = "test-boundary") -> bytes:
 # QIDO-RS
 # ---------------------------------------------------------------------------
 class TestQIDO:
-    def test_qido_studies_returns_dicom_json(
-        self, dicomweb_client: TestClient
-    ) -> None:
-        r = dicomweb_client.get(
-            "/dicomweb/studies", headers=_auth_headers()
-        )
+    def test_qido_studies_returns_dicom_json(self, dicomweb_client: TestClient) -> None:
+        r = dicomweb_client.get("/dicomweb/studies", headers=_auth_headers())
         assert r.status_code == 200
         data = r.json()
         assert len(data) == 1
         assert "0020000D" in data[0]  # StudyInstanceUID
 
-    def test_qido_series_returns_dicom_json(
-        self, dicomweb_client: TestClient
-    ) -> None:
+    def test_qido_series_returns_dicom_json(self, dicomweb_client: TestClient) -> None:
         r = dicomweb_client.get(
             f"/dicomweb/studies/{STUDY_UID}/series",
             headers=_auth_headers(),
@@ -377,9 +360,7 @@ class TestQIDO:
         assert len(data) == 1
         assert "0020000E" in data[0]  # SeriesInstanceUID
 
-    def test_qido_instances_returns_dicom_json(
-        self, dicomweb_client: TestClient
-    ) -> None:
+    def test_qido_instances_returns_dicom_json(self, dicomweb_client: TestClient) -> None:
         r = dicomweb_client.get(
             f"/dicomweb/studies/{STUDY_UID}/series/{SERIES_UID}/instances",
             headers=_auth_headers(),
@@ -394,9 +375,7 @@ class TestQIDO:
 # WADO-RS
 # ---------------------------------------------------------------------------
 class TestWADO:
-    def test_wado_study_returns_multipart(
-        self, dicomweb_client: TestClient
-    ) -> None:
+    def test_wado_study_returns_multipart(self, dicomweb_client: TestClient) -> None:
         r = dicomweb_client.get(
             f"/dicomweb/studies/{STUDY_UID}",
             headers=_auth_headers(),
@@ -405,9 +384,7 @@ class TestWADO:
         assert "multipart/related" in r.headers.get("content-type", "")
         assert _DICOM_BYTES in r.content
 
-    def test_wado_series_returns_multipart(
-        self, dicomweb_client: TestClient
-    ) -> None:
+    def test_wado_series_returns_multipart(self, dicomweb_client: TestClient) -> None:
         r = dicomweb_client.get(
             f"/dicomweb/studies/{STUDY_UID}/series/{SERIES_UID}",
             headers=_auth_headers(),
@@ -415,12 +392,9 @@ class TestWADO:
         assert r.status_code == 200
         assert "multipart/related" in r.headers.get("content-type", "")
 
-    def test_wado_instance_returns_multipart(
-        self, dicomweb_client: TestClient
-    ) -> None:
+    def test_wado_instance_returns_multipart(self, dicomweb_client: TestClient) -> None:
         r = dicomweb_client.get(
-            f"/dicomweb/studies/{STUDY_UID}/series/{SERIES_UID}"
-            f"/instances/{SOP_UID}",
+            f"/dicomweb/studies/{STUDY_UID}/series/{SERIES_UID}/instances/{SOP_UID}",
             headers=_auth_headers(),
         )
         assert r.status_code == 200
@@ -436,24 +410,16 @@ class TestWADO:
         fake_store.get_blob_calls = 0
         fake_store.get_range_calls = 0
         r = dicomweb_client.get(
-            f"/dicomweb/studies/{STUDY_UID}/series/{SERIES_UID}"
-            f"/instances/{SOP_UID}/frames/1",
+            f"/dicomweb/studies/{STUDY_UID}/series/{SERIES_UID}/instances/{SOP_UID}/frames/1",
             headers=_auth_headers(),
         )
         assert r.status_code == 200
-        assert fake_store.get_range_calls >= 1, (
-            "frame request must use get_range"
-        )
-        assert fake_store.get_blob_calls == 0, (
-            "frame request must NOT use get_blob"
-        )
+        assert fake_store.get_range_calls >= 1, "frame request must use get_range"
+        assert fake_store.get_blob_calls == 0, "frame request must NOT use get_blob"
 
-    def test_wado_metadata_returns_json(
-        self, dicomweb_client: TestClient
-    ) -> None:
+    def test_wado_metadata_returns_json(self, dicomweb_client: TestClient) -> None:
         r = dicomweb_client.get(
-            f"/dicomweb/studies/{STUDY_UID}/series/{SERIES_UID}"
-            f"/instances/{SOP_UID}/metadata",
+            f"/dicomweb/studies/{STUDY_UID}/series/{SERIES_UID}/instances/{SOP_UID}/metadata",
             headers=_auth_headers(),
         )
         assert r.status_code == 200
@@ -461,12 +427,9 @@ class TestWADO:
         assert len(data) == 1
         assert "00080018" in data[0]  # SOPInstanceUID
 
-    def test_wado_rendered_returns_jpeg(
-        self, dicomweb_client: TestClient
-    ) -> None:
+    def test_wado_rendered_returns_jpeg(self, dicomweb_client: TestClient) -> None:
         r = dicomweb_client.get(
-            f"/dicomweb/studies/{STUDY_UID}/series/{SERIES_UID}"
-            f"/instances/{SOP_UID}/rendered",
+            f"/dicomweb/studies/{STUDY_UID}/series/{SERIES_UID}/instances/{SOP_UID}/rendered",
             headers=_auth_headers(),
         )
         assert r.status_code == 200
@@ -490,26 +453,19 @@ class TestSTOW:
             headers={
                 **_auth_headers(),
                 "Content-Type": (
-                    'multipart/related; type="application/dicom"; '
-                    "boundary=test-boundary"
+                    'multipart/related; type="application/dicom"; boundary=test-boundary'
                 ),
             },
         )
         assert r.status_code == 200
         # Verify the instance was written to quarantine, not dicom
-        quarantined = [
-            k for k in fake_store._data if k.startswith("quarantine/")
-        ]
-        assert len(quarantined) == 1, (
-            "STOW must write to quarantine prefix"
-        )
+        quarantined = [k for k in fake_store._data if k.startswith("quarantine/")]
+        assert len(quarantined) == 1, "STOW must write to quarantine prefix"
         dicom_keys = [k for k in fake_store._data if k.startswith("dicom/")]
         # Only the pre-seeded dicom key should exist
         assert len(dicom_keys) == 1
 
-    def test_stow_returns_200_on_success(
-        self, dicomweb_client: TestClient
-    ) -> None:
+    def test_stow_returns_200_on_success(self, dicomweb_client: TestClient) -> None:
         body = _stow_body(_DICOM_BYTES)
         r = dicomweb_client.post(
             "/dicomweb/studies",
@@ -517,8 +473,7 @@ class TestSTOW:
             headers={
                 **_auth_headers(),
                 "Content-Type": (
-                    'multipart/related; type="application/dicom"; '
-                    "boundary=test-boundary"
+                    'multipart/related; type="application/dicom"; boundary=test-boundary'
                 ),
             },
         )
@@ -527,17 +482,14 @@ class TestSTOW:
         data = r.json()
         assert "00081199" in data  # ReferencedSOPSequence
 
-    def test_stow_empty_body_returns_400(
-        self, dicomweb_client: TestClient
-    ) -> None:
+    def test_stow_empty_body_returns_400(self, dicomweb_client: TestClient) -> None:
         r = dicomweb_client.post(
             "/dicomweb/studies",
             content=b"",
             headers={
                 **_auth_headers(),
                 "Content-Type": (
-                    'multipart/related; type="application/dicom"; '
-                    "boundary=test-boundary"
+                    'multipart/related; type="application/dicom"; boundary=test-boundary'
                 ),
             },
         )
@@ -552,9 +504,7 @@ class TestDICOMwebAuth:
         r = dicomweb_client.get("/dicomweb/studies")
         assert r.status_code == 401
 
-    def test_unenrolled_mfa_returns_403(
-        self, dicomweb_app: FastAPI
-    ) -> None:
+    def test_unenrolled_mfa_returns_403(self, dicomweb_app: FastAPI) -> None:
         verifier = dicomweb_app.state.token_verifier
         assert isinstance(verifier, FakeTokenVerifier)
         verifier.default_user = make_user(
@@ -565,9 +515,7 @@ class TestDICOMwebAuth:
         r = client.get("/dicomweb/studies", headers=_auth_headers())
         assert r.status_code == 403
 
-    def test_viewer_cannot_import(
-        self, dicomweb_app: FastAPI
-    ) -> None:
+    def test_viewer_cannot_import(self, dicomweb_app: FastAPI) -> None:
         """Viewer lacks STUDY_IMPORT → POST /studies is 403."""
         verifier = dicomweb_app.state.token_verifier
         assert isinstance(verifier, FakeTokenVerifier)
@@ -583,16 +531,13 @@ class TestDICOMwebAuth:
             headers={
                 **_auth_headers(),
                 "Content-Type": (
-                    'multipart/related; type="application/dicom"; '
-                    "boundary=test-boundary"
+                    'multipart/related; type="application/dicom"; boundary=test-boundary'
                 ),
             },
         )
         assert r.status_code == 403
 
-    def test_viewer_can_search(
-        self, dicomweb_app: FastAPI
-    ) -> None:
+    def test_viewer_can_search(self, dicomweb_app: FastAPI) -> None:
         """Viewer has STUDY_SEARCH → GET /studies is 200."""
         verifier = dicomweb_app.state.token_verifier
         assert isinstance(verifier, FakeTokenVerifier)
@@ -630,9 +575,7 @@ class TestCrossTenant:
         app.state.audit_object_store = StubAuditStore(locked=True)
         return app
 
-    def test_cross_tenant_study_returns_404(
-        self, other_tenant_app: FastAPI
-    ) -> None:
+    def test_cross_tenant_study_returns_404(self, other_tenant_app: FastAPI) -> None:
         """Accessing another tenant's study returns 404, not 403."""
         client = TestClient(other_tenant_app)
         r = client.get(
@@ -641,24 +584,18 @@ class TestCrossTenant:
         )
         assert r.status_code == 404
 
-    def test_cross_tenant_instance_returns_404(
-        self, other_tenant_app: FastAPI
-    ) -> None:
+    def test_cross_tenant_instance_returns_404(self, other_tenant_app: FastAPI) -> None:
         client = TestClient(other_tenant_app)
         r = client.get(
-            f"/dicomweb/studies/{STUDY_UID}/series/{SERIES_UID}"
-            f"/instances/{SOP_UID}",
+            f"/dicomweb/studies/{STUDY_UID}/series/{SERIES_UID}/instances/{SOP_UID}",
             headers=_auth_headers(),
         )
         assert r.status_code == 404
 
-    def test_cross_tenant_metadata_returns_404(
-        self, other_tenant_app: FastAPI
-    ) -> None:
+    def test_cross_tenant_metadata_returns_404(self, other_tenant_app: FastAPI) -> None:
         client = TestClient(other_tenant_app)
         r = client.get(
-            f"/dicomweb/studies/{STUDY_UID}/series/{SERIES_UID}"
-            f"/instances/{SOP_UID}/metadata",
+            f"/dicomweb/studies/{STUDY_UID}/series/{SERIES_UID}/instances/{SOP_UID}/metadata",
             headers=_auth_headers(),
         )
         assert r.status_code == 404

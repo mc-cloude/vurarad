@@ -97,12 +97,9 @@ class MinioObjectStore:
             return False
 
     def _list_prefix_sync(self, prefix: str, limit: int) -> list[ObjectRef]:
-        resp = self._client.list_objects_v2(
-            Bucket=self._bucket_name, Prefix=prefix, MaxKeys=limit
-        )
+        resp = self._client.list_objects_v2(Bucket=self._bucket_name, Prefix=prefix, MaxKeys=limit)
         return [
-            ObjectRef(bucket=self._bucket_name, key=obj["Key"])
-            for obj in resp.get("Contents", [])
+            ObjectRef(bucket=self._bucket_name, key=obj["Key"]) for obj in resp.get("Contents", [])
         ]
 
     def _copy_sync(self, src_key: str, dst_key: str) -> ObjectRef:
@@ -140,9 +137,7 @@ class MinioObjectStore:
             params["ResponseContentType"] = headers["Content-Type"]
         return cast(
             str,
-            self._client.generate_presigned_url(
-                "get_object", Params=params, ExpiresIn=ttl_seconds
-            ),
+            self._client.generate_presigned_url("get_object", Params=params, ExpiresIn=ttl_seconds),
         )
 
     def _signed_upload_url_sync(
@@ -265,9 +260,7 @@ class MinioObjectStore:
         content_type: str,
         ttl_seconds: int,
     ) -> str:
-        return await asyncio.to_thread(
-            self._signed_upload_url_sync, key, content_type, ttl_seconds
-        )
+        return await asyncio.to_thread(self._signed_upload_url_sync, key, content_type, ttl_seconds)
 
     async def create_resumable_upload(
         self,

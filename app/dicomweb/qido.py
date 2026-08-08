@@ -34,9 +34,7 @@ def _clamp_limit(raw_limit: int | None) -> int:
     return min(raw_limit, QIDO_MAX_LIMIT)
 
 
-def _extract_filters(
-    query_params: dict[str, str], allowed: frozenset[str]
-) -> dict[str, str]:
+def _extract_filters(query_params: dict[str, str], allowed: frozenset[str]) -> dict[str, str]:
     """Extract DICOM attribute filters from query params."""
     return {k: v for k, v in query_params.items() if k in allowed}
 
@@ -63,9 +61,7 @@ async def query_series(
 ) -> list[dict[str, Any]]:
     """QIDO-RS: query series within a study."""
     clamped = _clamp_limit(limit)
-    series_list = await store.query_series(
-        study.study_uid, user.tenant_id, clamped, offset
-    )
+    series_list = await store.query_series(study.study_uid, user.tenant_id, clamped, offset)
     return [series_to_dicom_json(s) for s in series_list]
 
 

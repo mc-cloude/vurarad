@@ -75,9 +75,7 @@ class StorageService:
         )
 
     # -- read paths ----------------------------------------------------------
-    async def get_instance(
-        self, study_uid: str, series_uid: str, sop_uid: str
-    ) -> bytes:
+    async def get_instance(self, study_uid: str, series_uid: str, sop_uid: str) -> bytes:
         ref = self.dicom_ref(study_uid, series_uid, sop_uid)
         return await self._store.get_blob(ref.key)
 
@@ -92,15 +90,11 @@ class StorageService:
         ref = self.dicom_ref(study_uid, series_uid, sop_uid)
         return await self._store.get_range(ref.key, start, end)
 
-    async def delete_instance(
-        self, study_uid: str, series_uid: str, sop_uid: str
-    ) -> None:
+    async def delete_instance(self, study_uid: str, series_uid: str, sop_uid: str) -> None:
         ref = self.dicom_ref(study_uid, series_uid, sop_uid)
         await self._store.delete(ref.key)
 
-    async def instance_exists(
-        self, study_uid: str, series_uid: str, sop_uid: str
-    ) -> bool:
+    async def instance_exists(self, study_uid: str, series_uid: str, sop_uid: str) -> bool:
         ref = self.dicom_ref(study_uid, series_uid, sop_uid)
         return await self._store.exists(ref.key)
 

@@ -35,7 +35,7 @@ def _extract_boundary(content_type: str) -> str | None:
     idx = content_type.lower().find(marker)
     if idx < 0:
         return None
-    rest = content_type[idx + len(marker):]
+    rest = content_type[idx + len(marker) :]
     # Boundary may be quoted
     boundary = rest.split(";")[0].strip()
     if boundary.startswith('"') and boundary.endswith('"'):
@@ -59,7 +59,7 @@ def parse_multipart_related(body: bytes, boundary: str) -> list[bytes]:
             seg = seg[2:]
         # Find the header/body separator
         hdr_end = seg.find(b"\r\n\r\n")
-        payload = seg[hdr_end + 4:] if hdr_end >= 0 else seg
+        payload = seg[hdr_end + 4 :] if hdr_end >= 0 else seg
         # Strip trailing CRLF
         if payload.endswith(b"\r\n"):
             payload = payload[:-2]
@@ -182,9 +182,7 @@ async def store_instances(
 
         sop_class, _study_uid, _series_uid, sop_uid = uids
         try:
-            ref = await service.store_quarantine(
-                tenant, upload_id, sop_uid, part
-            )
+            ref = await service.store_quarantine(tenant, upload_id, sop_uid, part)
             stored.append((sop_class, sop_uid, ref.key))
         except Exception:  # noqa: BLE001
             logger.exception("Failed to store SOP instance %s", sop_uid)

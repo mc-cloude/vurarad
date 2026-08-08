@@ -147,9 +147,7 @@ def _make_gcs_store(bucket_name: str) -> Any:
     bucket.create()
     from app.storage.gcs import GcsObjectStore
 
-    store = GcsObjectStore(
-        client, bucket_name, signing_credentials=signing_creds
-    )
+    store = GcsObjectStore(client, bucket_name, signing_credentials=signing_creds)
     store._test_bucket = bucket  # type: ignore[attr-defined]
     return store
 
@@ -254,7 +252,9 @@ class TestObjectStoreContract:
 
     async def test_object_metadata(self, store: Any) -> None:
         await store.put(
-            "meta-key", b"metadata-test", "text/plain",
+            "meta-key",
+            b"metadata-test",
+            "text/plain",
             metadata={"foo": "bar"},
         )
         meta = await store.object_metadata("meta-key")
@@ -262,9 +262,7 @@ class TestObjectStoreContract:
         assert meta.content_type == "text/plain"
         assert isinstance(meta, ObjectMetadata)
 
-    async def test_signed_read_url_has_no_store_cache_control(
-        self, store: Any
-    ) -> None:
+    async def test_signed_read_url_has_no_store_cache_control(self, store: Any) -> None:
         """AC3: signed read URLs must include Cache-Control: private, no-store."""
         await store.put("signed-key", b"data", "text/plain")
         url = await store.generate_signed_read_url("signed-key", 300)
@@ -272,35 +270,31 @@ class TestObjectStoreContract:
         params = parse_qs(parsed.query)
         # Check for response-cache-control in the query params
         cache_control = params.get("response-cache-control", [None])[0]
-        assert cache_control is not None, (
-            "signed URL must include response-cache-control"
-        )
-        assert "no-store" in cache_control, (
-            "signed URL cache-control must include no-store"
-        )
+        assert cache_control is not None, "signed URL must include response-cache-control"
+        assert "no-store" in cache_control, "signed URL cache-control must include no-store"
 
     async def test_generate_signed_upload_url(self, store: Any) -> None:
-        url = await store.generate_signed_upload_url(
-            "upload-key", "application/dicom", 300
-        )
+        url = await store.generate_signed_upload_url("upload-key", "application/dicom", 300)
         assert url.startswith("http")
 
     async def test_create_resumable_upload(self, store: Any) -> None:
-        url = await store.create_resumable_upload(
-            "resumable-key", "application/dicom", 1024
-        )
+        url = await store.create_resumable_upload("resumable-key", "application/dicom", 1024)
         assert url.startswith("http")
 
     async def test_metadata_custom(self, store: Any) -> None:
         """Custom metadata must round-trip through object_metadata."""
         await store.put(
-            "custom-meta-key", b"data", "text/plain",
+            "custom-meta-key",
+            b"data",
+            "text/plain",
             metadata={"patient_id": "hashed-123"},
         )
         meta = await store.object_metadata("custom-meta-key")
-        assert meta.metadata.get("patient_id") == "hashed-123" or \
-            meta.metadata.get("foo") is not None or \
-            len(meta.metadata) >= 0  # metadata may be normalized by backend
+        assert (
+            meta.metadata.get("patient_id") == "hashed-123"
+            or meta.metadata.get("foo") is not None
+            or len(meta.metadata) >= 0
+        )  # metadata may be normalized by backend
 
 
 # ---------------------------------------------------------------------------

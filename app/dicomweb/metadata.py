@@ -126,9 +126,7 @@ class FirestoreDicomMetadataStore:
             "numInstances": series.num_instances,
         }
         await asyncio.to_thread(
-            self._series.document(
-                self._series_doc_id(series.study_uid, series.series_uid)
-            ).set,
+            self._series.document(self._series_doc_id(series.study_uid, series.series_uid)).set,
             doc_data,
         )
 
@@ -151,9 +149,7 @@ class FirestoreDicomMetadataStore:
         }
         await asyncio.to_thread(
             self._instances.document(
-                self._instance_doc_id(
-                    instance.study_uid, instance.series_uid, instance.sop_uid
-                )
+                self._instance_doc_id(instance.study_uid, instance.series_uid, instance.sop_uid)
             ).set,
             doc_data,
         )
@@ -162,9 +158,7 @@ class FirestoreDicomMetadataStore:
     async def get_study(self, study_uid: str, tenant_id: str) -> StudyRecord | None:
         import asyncio
 
-        doc = await asyncio.to_thread(
-            self._studies.document(self._study_doc_id(study_uid)).get
-        )
+        doc = await asyncio.to_thread(self._studies.document(self._study_doc_id(study_uid)).get)
         if not doc.exists:
             return None
         data = doc.to_dict()
@@ -190,9 +184,7 @@ class FirestoreDicomMetadataStore:
         import asyncio
 
         doc = await asyncio.to_thread(
-            self._series.document(
-                self._series_doc_id(study_uid, series_uid)
-            ).get
+            self._series.document(self._series_doc_id(study_uid, series_uid)).get
         )
         if not doc.exists:
             return None
@@ -215,9 +207,7 @@ class FirestoreDicomMetadataStore:
         import asyncio
 
         doc = await asyncio.to_thread(
-            self._instances.document(
-                self._instance_doc_id(study_uid, series_uid, sop_uid)
-            ).get
+            self._instances.document(self._instance_doc_id(study_uid, series_uid, sop_uid)).get
         )
         if not doc.exists:
             return None

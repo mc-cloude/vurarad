@@ -117,9 +117,7 @@ def test_every_non_public_route_requires_authentication() -> None:
         if (method, path) in PUBLIC_ROUTES:
             continue
         names = _dep_names(route)
-        assert "get_current_user" in names, (
-            f"Route {method} {path} does not require authentication"
-        )
+        assert "get_current_user" in names, f"Route {method} {path} does not require authentication"
 
 
 def test_dicomweb_routes_require_auth_and_mfa() -> None:
@@ -129,12 +127,8 @@ def test_dicomweb_routes_require_auth_and_mfa() -> None:
     assert len(routes) == 10, f"Expected 10 dicomweb routes, got {len(routes)}"
     for method, path, route in routes:
         names = _dep_names(route)
-        assert "get_current_user" in names, (
-            f"Route {method} {path} missing get_current_user"
-        )
-        assert "require_mfa" in names, (
-            f"Route {method} {path} missing require_mfa"
-        )
+        assert "get_current_user" in names, f"Route {method} {path} missing get_current_user"
+        assert "require_mfa" in names, f"Route {method} {path} missing require_mfa"
 
 
 def test_dicomweb_routes_declare_exactly_one_capability() -> None:
@@ -146,9 +140,7 @@ def test_dicomweb_routes_declare_exactly_one_capability() -> None:
             f"Route {method} {path} declares {len(caps)} capabilities, expected 1"
         )
         cap = _extract_capability(caps[0])
-        assert cap is not None, (
-            f"Route {method} {path} capability closure has no Capability value"
-        )
+        assert cap is not None, f"Route {method} {path} capability closure has no Capability value"
 
 
 def test_dicomweb_route_capabilities_match_inventory() -> None:
@@ -185,9 +177,7 @@ def test_no_dicomweb_route_in_public_routes() -> None:
         )
 
 
-_FORBIDDEN_PARAM_NAMES = frozenset(
-    {"study_instance_uid", "patient_name", "mrn", "patient_id"}
-)
+_FORBIDDEN_PARAM_NAMES = frozenset({"study_instance_uid", "patient_name", "mrn", "patient_id"})
 
 
 def test_no_route_path_contains_direct_identifier_param() -> None:

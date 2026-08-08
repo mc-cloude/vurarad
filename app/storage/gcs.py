@@ -182,9 +182,7 @@ class GcsObjectStore:
         content_type: str,
         metadata: Mapping[str, str] | None = None,
     ) -> ObjectRef:
-        return await asyncio.to_thread(
-            self._put_sync, key, data, content_type, metadata
-        )
+        return await asyncio.to_thread(self._put_sync, key, data, content_type, metadata)
 
     async def get_blob(self, key: str) -> bytes:
         return await asyncio.to_thread(self._get_blob_sync, key)
@@ -223,9 +221,7 @@ class GcsObjectStore:
         content_type: str,
         ttl_seconds: int,
     ) -> str:
-        return await asyncio.to_thread(
-            self._signed_upload_url_sync, key, content_type, ttl_seconds
-        )
+        return await asyncio.to_thread(self._signed_upload_url_sync, key, content_type, ttl_seconds)
 
     async def create_resumable_upload(
         self,

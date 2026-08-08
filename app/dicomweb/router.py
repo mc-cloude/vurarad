@@ -90,9 +90,7 @@ async def qido_instances(
 ) -> list[dict[str, Any]]:
     limit = int(request.query_params.get("limit", "100"))
     offset = request.query_params.get("offset")
-    return await query_instances(
-        study, series_uid, store, user, limit=limit, offset=offset
-    )
+    return await query_instances(study, series_uid, store, user, limit=limit, offset=offset)
 
 
 # ---------------------------------------------------------------------------
@@ -123,9 +121,7 @@ async def wado_series(
     object_store: ObjectStoreDep,
     user: AuthenticatedUser = Depends(get_current_user),
 ) -> Response:
-    body, boundary = await retrieve_series(
-        study, series_uid, store, object_store, user
-    )
+    body, boundary = await retrieve_series(study, series_uid, store, object_store, user)
     return _multipart_response(body, boundary, "application/dicom")
 
 
@@ -141,9 +137,7 @@ async def wado_instance(
     object_store: ObjectStoreDep,
     user: AuthenticatedUser = Depends(get_current_user),
 ) -> Response:
-    body, boundary = await retrieve_instance(
-        study, series_uid, sop_uid, store, object_store, user
-    )
+    body, boundary = await retrieve_instance(study, series_uid, sop_uid, store, object_store, user)
     return _multipart_response(body, boundary, "application/dicom")
 
 
