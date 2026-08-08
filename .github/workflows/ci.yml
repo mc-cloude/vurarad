@@ -57,10 +57,10 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt pytest pytest-asyncio pytest-cov httpx
-      - name: unit tests + coverage
-        run: pytest tests/unit -q --cov=app --cov-fail-under=85
-      - name: integration tests
-        run: pytest tests/integration -q
+      - name: unit tests
+        run: pytest tests/unit -q
+      - name: integration tests + coverage
+        run: pytest tests/ -q --cov=app --cov-fail-under=85
 
   # -------------------------------------------------------------------- build
   build:
