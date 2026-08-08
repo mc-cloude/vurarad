@@ -119,6 +119,19 @@ class Settings(BaseSettings):
     tenant_monthly_infra_ceiling_usd: float = 10.00
     overage_price_per_100_images_usd: float = 0.25
     included_studies_per_month: int = 300
+    # Spend-stage thresholds for (WARN, AI_DISABLED, OVERAGE); strictly
+    # ascending and the last <= 1.0 — validated, because unordered thresholds
+    # would degrade in the wrong order (§3.19.3).
+    degradation_stage_thresholds: tuple[float, float, float] = (0.80, 0.95, 1.00)
+    # Bounded-write flush interval. The residual loss window if the process is
+    # killed between flushes is one interval — documented, not zero.
+    metering_flush_interval_seconds: int = 60
+
+    # -- on-prem licence (§3.19.4) ------------------------------------------
+    # RSA public key (PEM) for detached-JWS licence verification. Required for
+    # on-prem deployments; None disables licence enforcement in cloud mode.
+    licence_public_key_pem: str | None = None
+    licence_grace_days: int = 30
 
     # -- residency (D16) -----------------------------------------------------
     residency_policy: ResidencyPolicy = ResidencyPolicy.africa
@@ -159,6 +172,18 @@ class Settings(BaseSettings):
             raise ValueError(
                 f"segmentation_region={self.segmentation_region} not in "
                 f"Vertex AI allowlist for residency_policy=africa"
+            )
+
+        # Spend-ceiling controls (D15/D18, §3.19)
+        if self.tenant_monthly_infra_ceiling_usd <= 0:
+            raise ValueError("tenant_monthly_infra_ceiling_usd must be > 0")
+        if self.overage_price_per_100_images_usd < 0:
+            raise ValueError("overage_price_per_100_images_usd must be >= 0")
+        warn_t, ai_t, overage_t = self.degradation_stage_thresholds
+        if not (0 < warn_t < ai_t < overage_t <= 1.0):
+            raise ValueError(
+                "degradation_stage_thresholds must be strictly ascending and "
+                "the final threshold must be <= 1.0"
             )
 
         return self

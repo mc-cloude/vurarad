@@ -1,0 +1,28 @@
+# vuraRAD rate card — us-central1
+# Per-meter unit costs in USD. This is a DATA file: a service module never
+# hardcodes any of these values. Effective date governs which card is active.
+region: us-central1
+effective_date: "2026-01-01"
+version: "2026-01"
+currency: USD
+# Images covered by the monthly infrastructure ceiling (D18: ~300 studies /
+# ~120,000 images). Overage is metered beyond this from images_ingested.
+included_images_per_month: 120000
+rates:
+  images_ingested:         { unit: count,    unit_cost_usd: 0.0 }
+  studies_ingested:        { unit: count,    unit_cost_usd: 0.026 }
+  ai_draft_requests:       { unit: count,    unit_cost_usd: 0.0 }
+  ai_draft_tokens:         { unit: tokens,   unit_cost_usd: 0.00000125 }
+  ai_qa_requests:          { unit: count,    unit_cost_usd: 0.0 }
+  ai_qa_tokens:            { unit: tokens,   unit_cost_usd: 0.00000125 }
+  segmentation_inferences: { unit: count,    unit_cost_usd: 0.015 }
+  dicomweb_qido:           { unit: count,    unit_cost_usd: 0.000004 }
+  dicomweb_wado:           { unit: count,    unit_cost_usd: 0.000004 }
+  dicomweb_stow:           { unit: count,    unit_cost_usd: 0.000005 }
+  storage_bytes_month:     { unit: GB-month, unit_cost_usd: 0.02 }
+  egress_bytes:            { unit: GB,       unit_cost_usd: 0.08 }
+  reports_signed:          { unit: count,    unit_cost_usd: 0.0 }
+  reports_addenda:         { unit: count,    unit_cost_usd: 0.0 }
+  deid_studies:            { unit: count,    unit_cost_usd: 0.008 }
+  deid_burned_in:          { unit: count,    unit_cost_usd: 0.015 }
+  research_extractions:    { unit: count,    unit_cost_usd: 0.004 }

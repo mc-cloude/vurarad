@@ -59,6 +59,25 @@ class MfaRequiredError(ApiError):
     message = "Second-factor verification is required"
 
 
+# -- metering / ceiling / licence errors ------------------------------------
+class SpendCeilingAiDisabledError(ApiError):
+    code = ErrorCode.SPEND_CEILING_AI_DISABLED
+    status_code = 402
+    message = "AI use is disabled by the spend ceiling"
+
+
+class LicenceInvalidError(ApiError):
+    code = ErrorCode.LICENCE_INVALID
+    status_code = 402
+    message = "Licence token is invalid"
+
+
+class LicenceGraceExpiredError(ApiError):
+    code = ErrorCode.LICENCE_GRACE_EXPIRED
+    status_code = 402
+    message = "Licence grace period has expired"
+
+
 # -- domain errors ----------------------------------------------------------
 class NotFoundError(ApiError):
     code = ErrorCode.NOT_FOUND

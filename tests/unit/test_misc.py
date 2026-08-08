@@ -219,7 +219,15 @@ def test_auth_me_returns_role_capabilities_for_admin(
     r = client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {VALID_TOKEN}"})
     assert r.status_code == 200
     caps = set(r.json()["capabilities"])
-    assert caps == {"audit:read", "audit:export", "analytics:read", "user:manage"}
+    assert caps == {
+        "audit:read",
+        "audit:export",
+        "analytics:read",
+        "user:manage",
+        "usage:read",
+        "billing:read",
+        "billing:manage",
+    }
 
 
 # ---------------------------------------------------------------------------

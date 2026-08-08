@@ -38,6 +38,9 @@ def test_admin_capabilities() -> None:
             Capability.AUDIT_EXPORT,
             Capability.ANALYTICS_READ,
             Capability.USER_MANAGE,
+            Capability.USAGE_READ,
+            Capability.BILLING_READ,
+            Capability.BILLING_MANAGE,
         }
     )
 
@@ -109,3 +112,19 @@ def test_has_capability_true_false() -> None:
 def test_is_phi_capability() -> None:
     assert is_phi_capability(Capability.STUDY_READ) is True
     assert is_phi_capability(Capability.AUDIT_READ) is False
+
+
+# ---------------------------------------------------------------------------
+# WP14 criterion 8 — billing/usage are not PHI; admin holds them, no PHI
+# ---------------------------------------------------------------------------
+def test_billing_capabilities_are_not_phi() -> None:
+    assert is_phi_capability(Capability.BILLING_MANAGE) is False
+    assert is_phi_capability(Capability.BILLING_READ) is False
+    assert is_phi_capability(Capability.USAGE_READ) is False
+
+
+def test_admin_holds_billing_and_usage() -> None:
+    admin = ROLE_CAPABILITIES[Role.ADMIN]
+    assert Capability.BILLING_MANAGE in admin
+    assert Capability.BILLING_READ in admin
+    assert Capability.USAGE_READ in admin

@@ -27,6 +27,11 @@ class Capability(StrEnum):
     IMAGING_ACCESS = "imaging:access"
     AI_DRAFT = "ai:draft"
     AI_FULL = "ai:full"
+    # Spend-gated AI use (WP14 §3.19.3): the capability the ceiling blocks at
+    # AI_DISABLED/OVERAGE. Distinct from ai:draft so the spend gate can disable
+    # AI use without touching the broader RBAC grant.
+    AI_USE = "ai:use"
+    RESEARCH_DRAFT = "research:draft"
 
     # -- administration ------------------------------------------------------
     AUDIT_READ = "audit:read"
@@ -35,6 +40,11 @@ class Capability(StrEnum):
     COMPLIANCE_PURGE = "compliance:purge"
     USER_MANAGE = "user:manage"
     BREAK_GLASS = "break_glass"
+    # Billing / usage (WP14 §3.19). These are NOT PHI capabilities: an admin
+    # holds them while holding zero PHI capabilities (separation of duties).
+    USAGE_READ = "usage:read"
+    BILLING_READ = "billing:read"
+    BILLING_MANAGE = "billing:manage"
 
     # -- research ------------------------------------------------------------
     RESEARCH_COHORT_CREATE = "research:cohort:create"
@@ -84,6 +94,9 @@ ROLE_CAPABILITIES: dict[Role, frozenset[Capability]] = {
             Capability.AUDIT_EXPORT,
             Capability.ANALYTICS_READ,
             Capability.USER_MANAGE,
+            Capability.USAGE_READ,
+            Capability.BILLING_READ,
+            Capability.BILLING_MANAGE,
         }
     ),
     Role.VIEWER: frozenset(
@@ -131,6 +144,14 @@ assert Capability.STUDY_READ not in ROLE_CAPABILITIES[Role.ADMIN]
 # Viewer must NOT be able to write or sign
 assert Capability.REPORT_WRITE not in ROLE_CAPABILITIES[Role.VIEWER]
 assert Capability.REPORT_SIGN not in ROLE_CAPABILITIES[Role.VIEWER]
+
+# B2/WP14: billing capabilities are NOT PHI capabilities, and admin holds them
+# while holding zero PHI capabilities — billing:manage requires fresh 2FA and
+# must never gate a PHI action.
+assert Capability.BILLING_MANAGE not in PHI_CAPABILITIES
+assert Capability.BILLING_READ not in PHI_CAPABILITIES
+assert Capability.USAGE_READ not in PHI_CAPABILITIES
+assert ROLE_CAPABILITIES[Role.ADMIN] & PHI_CAPABILITIES == frozenset()
 
 
 def get_role_capabilities(role: Role) -> frozenset[Capability]:
