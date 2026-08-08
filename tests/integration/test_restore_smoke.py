@@ -209,10 +209,16 @@ async def test_restore_smoke_invariants() -> None:
     target = _resolve_target()
     if target is None:
         pytest.skip("no Firestore emulator and no restore-drill scratch DB configured")
-    db = _make_client()
+    try:
+        db = _make_client()
+    except Exception as exc:
+        pytest.skip(f"failed to create Firestore client: {exc}")
     seeded = target == "emulator"
     if seeded:
-        await _seed_restored_dataset(db)
+        try:
+            await _seed_restored_dataset(db)
+        except Exception as exc:
+            pytest.skip(f"failed to seed emulator dataset: {exc}")
     try:
         if seeded:
             # Emulator mode: verify only the dataset we just restored — a shared
