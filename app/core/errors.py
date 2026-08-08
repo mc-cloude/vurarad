@@ -72,6 +72,12 @@ class ConflictError(ApiError):
     message = "Resource conflict"
 
 
+class AuditStoreNotImmutableError(ApiError):
+    code = ErrorCode.AUDIT_STORE_NOT_IMMUTABLE
+    status_code = 503
+    message = "Audit store does not enforce bucket lock (WORM)"
+
+
 # -- envelope ----------------------------------------------------------------
 def _make_error_body(
     code: ErrorCode,

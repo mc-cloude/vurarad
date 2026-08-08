@@ -43,6 +43,7 @@ class AuthenticatedUser:
     mfa_state: SecondFactorState = SecondFactorState.UNENROLLED
     capabilities: frozenset[Capability] = field(init=False)
     operator_id: str = ""  # ULID, stable per user
+    tenant_id: str = "default"  # tenant scope for cross-tenant study access
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "capabilities", get_role_capabilities(self.role))

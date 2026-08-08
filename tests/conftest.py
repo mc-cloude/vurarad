@@ -84,6 +84,20 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 # ---------------------------------------------------------------------------
+# StubAuditStore — minimal ObjectStore for readyz bucket-lock probe
+# ---------------------------------------------------------------------------
+class StubAuditStore:
+    """Minimal ObjectStore stub with configurable bucket-lock support."""
+
+    def __init__(self, *, locked: bool = True) -> None:
+        self._locked = locked
+
+    @property
+    def supports_bucket_lock(self) -> bool:
+        return self._locked
+
+
+# ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 def make_user(
@@ -177,6 +191,7 @@ def fake_verifier() -> FakeTokenVerifier:
 def app(fake_verifier: FakeTokenVerifier) -> FastAPI:
     application = create_app()
     application.state.token_verifier = fake_verifier
+    application.state.audit_object_store = StubAuditStore(locked=True)
     return application
 
 

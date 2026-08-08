@@ -2,7 +2,7 @@
 
 import json
 from enum import StrEnum
-from typing import Self
+from typing import Literal, Self
 
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -95,6 +95,17 @@ class Settings(BaseSettings):
     audit_bucket_name: str
     deid_bucket_name: str | None = None
 
+    # -- Object-store backend selection --------------------------------------
+    storage_backend: Literal["gcs", "minio"] = "gcs"
+    quarantine_bucket_name: str | None = None
+
+    # -- MinIO (on-prem S3-compatible) ---------------------------------------
+    minio_endpoint: str | None = None
+    minio_access_key: str | None = None
+    minio_secret_key: str | None = None
+    minio_region: str = ""
+    minio_secure: bool = True
+
     # -- auth ----------------------------------------------------------------
     firebase_project_id: str
     identity_platform_project_id: str | None = None
@@ -160,6 +171,20 @@ class Settings(BaseSettings):
                 f"segmentation_region={self.segmentation_region} not in "
                 f"Vertex AI allowlist for residency_policy=africa"
             )
+
+        # MinIO backend validation
+        if self.storage_backend == "minio":
+            if not self.minio_endpoint:
+                raise ValueError(
+                    "MINIO_ENDPOINT is required when STORAGE_BACKEND=minio"
+                )
+            if self.is_production and (
+                not self.minio_access_key or not self.minio_secret_key
+            ):
+                raise ValueError(
+                    "MINIO_ACCESS_KEY and MINIO_SECRET_KEY are required"
+                    " when STORAGE_BACKEND=minio and ENVIRONMENT=production"
+                )
 
         return self
 

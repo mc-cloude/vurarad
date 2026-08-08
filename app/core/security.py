@@ -6,6 +6,15 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
 
+# Routes that are exempt from authentication — health probes only.
+# This allowlist must stay minimal; tests assert it has exactly 2 entries.
+PUBLIC_ROUTES: frozenset[tuple[str, str]] = frozenset(
+    {
+        ("GET", "/healthz"),
+        ("GET", "/readyz"),
+    }
+)
+
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(

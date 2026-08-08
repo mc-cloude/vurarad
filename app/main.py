@@ -70,9 +70,11 @@ def create_app() -> FastAPI:
     # -- routers -------------------------------------------------------------
     from app.api.v1.routers.auth import router as auth_router
     from app.api.v1.routers.health import router as health_router
+    from app.dicomweb.router import router as dicomweb_router
 
     app.include_router(health_router)
     app.include_router(auth_router, prefix="/api/v1")
+    app.include_router(dicomweb_router)
 
     return app
 

@@ -47,3 +47,4 @@ class ErrorCode(StrEnum):
 
     # -- audit ---------------------------------------------------------------
     AUDIT_CHAIN_BROKEN = "AUDIT_CHAIN_BROKEN"
+    AUDIT_STORE_NOT_IMMUTABLE = "AUDIT_STORE_NOT_IMMUTABLE"
