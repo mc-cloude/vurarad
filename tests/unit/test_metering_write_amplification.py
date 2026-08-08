@@ -42,10 +42,7 @@ class InMemoryUsageStore:
         self.event_count += 1
 
     async def get_usage(self, tenant_id: str, period: str) -> UsagePeriod:
-        meters = {
-            m: v for (t, p, m), v in self._meters.items()
-            if t == tenant_id and p == period
-        }
+        meters = {m: v for (t, p, m), v in self._meters.items() if t == tenant_id and p == period}
         return UsagePeriod(tenant_id=tenant_id, period=period, meters=meters)
 
     async def list_history(self, tenant_id: str, months: int) -> list[UsagePeriod]:

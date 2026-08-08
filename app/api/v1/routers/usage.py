@@ -29,9 +29,7 @@ def _usage_store(request: Request) -> UsageStore:
     return store
 
 
-_UsageCap = Annotated[
-    AuthenticatedUser, Depends(require_capability(Capability.USAGE_READ))
-]
+_UsageCap = Annotated[AuthenticatedUser, Depends(require_capability(Capability.USAGE_READ))]
 
 
 @router.get("/usage")

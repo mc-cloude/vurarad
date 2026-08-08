@@ -127,9 +127,7 @@ async def test_reconcile_tenant_compares_metered_to_billing() -> None:
         rates={Meter.STUDIES_INGESTED: 1.0},
     )
     store = InMemoryUsageStore(
-        usage=UsagePeriod(
-            tenant_id="t1", period="2026-08", meters={"studies_ingested": 10.0}
-        )
+        usage=UsagePeriod(tenant_id="t1", period="2026-08", meters={"studies_ingested": 10.0})
     )
     result = await reconcile_tenant(store, rate_card, "t1", "2026-08", billing_cost_usd=11.0)
     assert result.metered_cost_usd == 10.0

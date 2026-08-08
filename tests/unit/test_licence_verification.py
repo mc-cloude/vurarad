@@ -35,10 +35,14 @@ def _b64url(data: bytes) -> str:
 
 def _make_keypair() -> tuple[rsa.RSAPrivateKey, str]:
     private = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-    public_pem = private.public_key().public_bytes(
-        encoding=serialization.Encoding.PEM,
-        format=serialization.PublicFormat.SubjectPublicKeyInfo,
-    ).decode()
+    public_pem = (
+        private.public_key()
+        .public_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo,
+        )
+        .decode()
+    )
     return private, public_pem
 
 
@@ -183,10 +187,14 @@ def test_non_rsa_key_rejected() -> None:
     from cryptography.hazmat.primitives.asymmetric import ed25519
 
     ed_key = ed25519.Ed25519PrivateKey.generate()
-    bad_pem = ed_key.public_key().public_bytes(
-        encoding=serialization.Encoding.PEM,
-        format=serialization.PublicFormat.SubjectPublicKeyInfo,
-    ).decode()
+    bad_pem = (
+        ed_key.public_key()
+        .public_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo,
+        )
+        .decode()
+    )
     with pytest.raises(TypeError):
         _service(bad_pem)
 
@@ -266,9 +274,7 @@ def test_grace_days_left_counts_down() -> None:
 # ---------------------------------------------------------------------------
 def test_feature_entitlement_lookup() -> None:
     private, public_pem = _make_keypair()
-    token = _sign(
-        _claims(features=["findings_ingest", "slicer_addon", "workbench"]), private
-    )
+    token = _sign(_claims(features=["findings_ingest", "slicer_addon", "workbench"]), private)
     svc = _service(public_pem)
     claims = svc.verify_token(token)
     assert svc.has_feature(claims, "findings_ingest") is True

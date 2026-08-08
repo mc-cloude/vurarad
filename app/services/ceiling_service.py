@@ -125,9 +125,7 @@ class CeilingService:
         overage_images = max(0, images_used - images_included)
         # Overage is metered from images_ingested (criterion 4) — never
         # estimated. The price comes from settings, not a constant here.
-        overage_charge = (
-            overage_images * self._settings.overage_price_per_100_images_usd / 100
-        )
+        overage_charge = overage_images * self._settings.overage_price_per_100_images_usd / 100
 
         blocked = blocked_capabilities(stage)
         return CeilingState(

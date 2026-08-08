@@ -37,9 +37,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     from app.services.licence_service import LicenceService
     from app.services.metering_service import MeteringService
 
-    fs_client = AsyncClient(
-        project=settings.gcp_project_id, database=settings.firestore_database
-    )
+    fs_client = AsyncClient(project=settings.gcp_project_id, database=settings.firestore_database)
     usage_repo = UsageRepo(fs_client)
     rate_card = RateCard.load(settings.gcp_region)
     metering = MeteringService(

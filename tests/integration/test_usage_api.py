@@ -61,9 +61,7 @@ def _tenant_id() -> str:
     return f"int-{_tenant_prefix}-{next(_tenant_seq)}"
 
 
-def _set_admin(
-    fake_verifier: object, mfa: SecondFactorState = SecondFactorState.VERIFIED
-) -> None:
+def _set_admin(fake_verifier: object, mfa: SecondFactorState = SecondFactorState.VERIFIED) -> None:
     """Register an admin user on the fake verifier."""
     fake_verifier.users[VALID_TOKEN] = make_user(  # type: ignore[attr-defined]
         uid="u-admin", role=Role.ADMIN, mfa_state=mfa
@@ -101,9 +99,7 @@ def fs_client(emulator_env: None) -> object:
     """
     from google.cloud.firestore import AsyncClient
 
-    return AsyncClient(
-        project=settings.gcp_project_id, database=settings.firestore_database
-    )
+    return AsyncClient(project=settings.gcp_project_id, database=settings.firestore_database)
 
 
 @pytest.fixture
@@ -258,15 +254,9 @@ async def test_usage_history_api(
     _set_admin(fake_verifier)
     tid = _tenant_id()
     # Write to two past periods directly via the repo.
-    await usage_repo.increment_meter(
-        tid, "2026-01", Meter.IMAGES_INGESTED, 100, MeterUnit.COUNT
-    )
-    await usage_repo.increment_meter(
-        tid, "2026-02", Meter.IMAGES_INGESTED, 200, MeterUnit.COUNT
-    )
-    r = await ac.get(
-        f"/api/v1/usage/history?tenantId={tid}&months=12", headers=_AUTH
-    )
+    await usage_repo.increment_meter(tid, "2026-01", Meter.IMAGES_INGESTED, 100, MeterUnit.COUNT)
+    await usage_repo.increment_meter(tid, "2026-02", Meter.IMAGES_INGESTED, 200, MeterUnit.COUNT)
+    r = await ac.get(f"/api/v1/usage/history?tenantId={tid}&months=12", headers=_AUTH)
     assert r.status_code == 200
     periods = r.json()
     assert len(periods) == 2
@@ -297,9 +287,7 @@ async def test_overage_calculation(
     assert body["ceilingState"] == "OVERAGE"
 
 
-async def test_licence_route_no_token(
-    ac: AsyncClient, fake_verifier: object
-) -> None:
+async def test_licence_route_no_token(ac: AsyncClient, fake_verifier: object) -> None:
     """GET /licence returns valid=false when no token is installed."""
     _set_admin(fake_verifier)
     r = await ac.get("/api/v1/licence", headers=_AUTH)
@@ -307,9 +295,7 @@ async def test_licence_route_no_token(
     assert r.json()["valid"] is False
 
 
-async def test_ceiling_requires_fresh_mfa(
-    ac: AsyncClient, fake_verifier: object
-) -> None:
+async def test_ceiling_requires_fresh_mfa(ac: AsyncClient, fake_verifier: object) -> None:
     """POST /ceiling without fresh MFA → 403 MFA_REQUIRED (integration-level)."""
     _set_admin(fake_verifier, mfa=SecondFactorState.ENROLLED)
     tid = _tenant_id()

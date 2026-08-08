@@ -71,8 +71,12 @@ class _FakeCeilingService:
 class _FakeLicenceService:
     async def install(self, token: str) -> LicenceClaims:
         return LicenceClaims(
-            site_id="site-1", seats=5, tier="P2", features=["workbench"],
-            not_before=0, not_after=2_000_000_000,
+            site_id="site-1",
+            seats=5,
+            tier="P2",
+            features=["workbench"],
+            not_before=0,
+            not_after=2_000_000_000,
         )
 
     async def current_state(self, *, now: int | None = None) -> LicenceState:
@@ -81,7 +85,8 @@ class _FakeLicenceService:
 
 @pytest.fixture
 def wp14_app(
-    app: FastAPI, fake_verifier: object  # noqa: ARG001
+    app: FastAPI,
+    fake_verifier: object,  # noqa: ARG001
 ) -> FastAPI:
     app.state.usage_store = _FakeStore()
     app.state.ceiling_service = _FakeCeilingService()
@@ -106,9 +111,7 @@ def _set_user(fake_verifier: object, role: Role, mfa: SecondFactorState) -> None
 # ---------------------------------------------------------------------------
 # GET /usage requires usage:read
 # ---------------------------------------------------------------------------
-def test_usage_route_admin_ok(
-    wp14_client: TestClient, fake_verifier: object
-) -> None:
+def test_usage_route_admin_ok(wp14_client: TestClient, fake_verifier: object) -> None:
     _set_user(fake_verifier, Role.ADMIN, SecondFactorState.VERIFIED)
     r = wp14_client.get("/api/v1/usage?tenantId=t1", headers=_AUTH)
     assert r.status_code == 200
@@ -117,9 +120,7 @@ def test_usage_route_admin_ok(
     assert body["ceilingState"] == "OK"
 
 
-def test_usage_route_radiologist_forbidden(
-    wp14_client: TestClient, fake_verifier: object
-) -> None:
+def test_usage_route_radiologist_forbidden(wp14_client: TestClient, fake_verifier: object) -> None:
     _set_user(fake_verifier, Role.RADIOLOGIST, SecondFactorState.VERIFIED)
     r = wp14_client.get("/api/v1/usage?tenantId=t1", headers=_AUTH)
     assert r.status_code == 403
@@ -141,9 +142,7 @@ def test_set_ceiling_requires_billing_manage(
     assert r.status_code == 403
 
 
-def test_set_ceiling_requires_fresh_mfa(
-    wp14_client: TestClient, fake_verifier: object
-) -> None:
+def test_set_ceiling_requires_fresh_mfa(wp14_client: TestClient, fake_verifier: object) -> None:
     # Admin with billing:manage but NO fresh MFA → 403 MFA_REQUIRED.
     _set_user(fake_verifier, Role.ADMIN, SecondFactorState.ENROLLED)
     r = wp14_client.post(
@@ -172,9 +171,7 @@ def test_set_ceiling_succeeds_with_capability_and_mfa(
 # ---------------------------------------------------------------------------
 # POST /admin/licence requires billing:manage + fresh 2FA
 # ---------------------------------------------------------------------------
-def test_issue_licence_requires_fresh_mfa(
-    wp14_client: TestClient, fake_verifier: object
-) -> None:
+def test_issue_licence_requires_fresh_mfa(wp14_client: TestClient, fake_verifier: object) -> None:
     _set_user(fake_verifier, Role.ADMIN, SecondFactorState.ENROLLED)
     r = wp14_client.post(
         "/api/v1/admin/licence",
@@ -206,9 +203,7 @@ def test_licence_route_requires_auth(wp14_client: TestClient) -> None:
     assert r.status_code == 401
 
 
-def test_licence_route_authed_ok(
-    wp14_client: TestClient, fake_verifier: object
-) -> None:
+def test_licence_route_authed_ok(wp14_client: TestClient, fake_verifier: object) -> None:
     _set_user(fake_verifier, Role.VIEWER, SecondFactorState.VERIFIED)
     r = wp14_client.get("/api/v1/licence", headers=_AUTH)
     assert r.status_code == 200
@@ -223,19 +218,13 @@ def test_admin_read_usage_requires_billing_read(
 ) -> None:
     # Viewer has no billing:read → 403.
     _set_user(fake_verifier, Role.VIEWER, SecondFactorState.VERIFIED)
-    r = wp14_client.get(
-        "/api/v1/admin/tenants/t1/usage", headers=_AUTH
-    )
+    r = wp14_client.get("/api/v1/admin/tenants/t1/usage", headers=_AUTH)
     assert r.status_code == 403
 
 
-def test_admin_read_usage_admin_ok(
-    wp14_client: TestClient, fake_verifier: object
-) -> None:
+def test_admin_read_usage_admin_ok(wp14_client: TestClient, fake_verifier: object) -> None:
     _set_user(fake_verifier, Role.ADMIN, SecondFactorState.VERIFIED)
-    r = wp14_client.get(
-        "/api/v1/admin/tenants/t1/usage?period=2026-08", headers=_AUTH
-    )
+    r = wp14_client.get("/api/v1/admin/tenants/t1/usage?period=2026-08", headers=_AUTH)
     assert r.status_code == 200
     body: dict[str, Any] = r.json()
     assert body["tenantId"] == "t1"

@@ -129,14 +129,10 @@ def main(argv: list[str] | None = None) -> int:
     from app.repositories.usage_repo import UsageRepo
 
     rate_card = RateCard.load(args.region)
-    client = AsyncClient(
-        project=settings.gcp_project_id, database=settings.firestore_database
-    )
+    client = AsyncClient(project=settings.gcp_project_id, database=settings.firestore_database)
     store: UsageStore = UsageRepo(client)
     result = asyncio.run(
-        reconcile_tenant(
-            store, rate_card, args.tenant_id, args.period, args.billing_cost_usd
-        )
+        reconcile_tenant(store, rate_card, args.tenant_id, args.period, args.billing_cost_usd)
     )
     print(
         f"{METERING_RECONCILED} period={result.period} "

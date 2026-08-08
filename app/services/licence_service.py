@@ -88,9 +88,7 @@ def _b64url_decode(segment: str) -> bytes:
 class LicenceService:
     """Verifies and evaluates licences offline against the configured public key."""
 
-    def __init__(
-        self, store: LicenceStore, *, public_key_pem: str | None, grace_days: int
-    ) -> None:
+    def __init__(self, store: LicenceStore, *, public_key_pem: str | None, grace_days: int) -> None:
         self._store = store
         self._grace_days = grace_days
         self._public_key: rsa.RSAPublicKey | None = self._load_public_key(public_key_pem)
@@ -130,9 +128,7 @@ class LicenceService:
         # segment is not part of the signed bytes).
         signing_input = f"{header_b64}.{payload_b64}.".encode()
         try:
-            self._public_key.verify(
-                signature, signing_input, padding.PKCS1v15(), hashes.SHA256()
-            )
+            self._public_key.verify(signature, signing_input, padding.PKCS1v15(), hashes.SHA256())
         except InvalidSignature as exc:
             raise LicenceInvalidError("licence signature is invalid") from exc
         return LicenceClaims.model_validate(payload)

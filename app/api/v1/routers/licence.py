@@ -54,9 +54,7 @@ class LicenceBody(CamelModel):
 # Dependency aliases
 # ---------------------------------------------------------------------------
 _Authed = Annotated[AuthenticatedUser, Depends(get_current_user)]
-_BillingRead = Annotated[
-    AuthenticatedUser, Depends(require_capability(Capability.BILLING_READ))
-]
+_BillingRead = Annotated[AuthenticatedUser, Depends(require_capability(Capability.BILLING_READ))]
 _BillingManage = Annotated[
     AuthenticatedUser, Depends(require_capability(Capability.BILLING_MANAGE))
 ]

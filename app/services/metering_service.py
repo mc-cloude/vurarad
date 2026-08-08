@@ -75,9 +75,7 @@ class MeteringService:
             pending = self._buffer
             self._buffer = {}
         for (tenant_id, period, meter), delta in pending.items():
-            await self._store.increment_meter(
-                tenant_id, period, meter, delta, METER_UNITS[meter]
-            )
+            await self._store.increment_meter(tenant_id, period, meter, delta, METER_UNITS[meter])
 
     async def start(self) -> None:
         """Begin the periodic flush loop and install the SIGTERM drain."""

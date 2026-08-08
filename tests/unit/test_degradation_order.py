@@ -181,9 +181,7 @@ async def test_suspended_override_regardless_of_cost() -> None:
 
 
 async def test_ceiling_override_used_when_set() -> None:
-    config = CeilingConfig(
-        ceiling_usd=25.0, reason="enterprise pilot", suspended=False, set_at=""
-    )
+    config = CeilingConfig(ceiling_usd=25.0, reason="enterprise pilot", suspended=False, set_at="")
     state = await _state(10.0, config=config)  # $10 / $25 = 0.4 → OK
     assert state.stage == SpendStage.OK  # type: ignore[attr-defined]
     assert state.ceiling_usd == 25.0  # type: ignore[attr-defined]
