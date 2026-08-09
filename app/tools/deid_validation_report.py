@@ -41,7 +41,6 @@ from app.core.config import settings
 from app.services.deid.ocr import BBox, ThresholdOcrEngine
 from app.services.deid.phi_ner import OPENMED_MODEL_ID, OPENMED_MODEL_REVISION
 from app.services.deid.tags import TAG_PROFILE_VERSION
-from tests.data.deid.corpus import covered_pairs, render_corpus
 
 DOCS_PATH = Path(__file__).resolve().parents[2] / "docs" / "deid-validation.md"
 
@@ -75,6 +74,7 @@ def _modality_recall() -> dict[str, tuple[int, int, float]]:
     engine = ThresholdOcrEngine()
     recalled: dict[str, int] = defaultdict(int)
     total: dict[str, int] = defaultdict(int)
+    from tests.data.deid.corpus import render_corpus  # lazy — tests/ excluded from mypy
     for img in render_corpus():
         detected = engine.detect(img.array)
         for gt in img.regions:
@@ -92,6 +92,7 @@ def _modality_recall() -> dict[str, tuple[int, int, float]]:
 def generate_report() -> str:
     """Produce the full markdown validation report as a deterministic string."""
     recall = _modality_recall()
+    from tests.data.deid.corpus import covered_pairs  # lazy — tests/ excluded from mypy
     pairs = sorted(covered_pairs())
 
     lines: list[str] = []
