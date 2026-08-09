@@ -24,6 +24,7 @@ from app.core.auth import AuthenticatedUser
 from app.core.config import Settings
 from app.core.errors import NotFoundError
 from app.models.study import StudyRecord
+from app.repositories.sync_repo import SyncRepository
 from app.segmentation.registry import SegmentationRegistry
 from app.services.dictation_service import DictationService
 from app.services.finding_service import FindingService
@@ -31,6 +32,7 @@ from app.services.preprocessing.orchestrator import PreprocessingOrchestrator
 from app.services.preprocessing.segmentation_dispatcher import (
     SegmentationDispatcher,
 )
+from app.services.report_sync_service import ReportSyncService
 
 __all__ = [
     "CurrentMfaUserDep",
@@ -39,6 +41,7 @@ __all__ = [
     "FindingServiceDep",
     "OrchestratorDep",
     "PreprocessingRegistryDep",
+    "ReportSyncServiceDep",
     "StudyRecordDep",
     "resolve_study",
 ]
@@ -148,3 +151,25 @@ StudyRecordDep = Annotated[StudyRecord, Depends(resolve_study)]
 # MFA-verified current user (convenience alias)
 # ---------------------------------------------------------------------------
 CurrentMfaUserDep = Annotated[AuthenticatedUser, Depends(require_mfa)]
+
+
+# ---------------------------------------------------------------------------
+# Report sync service — offline draft sync (WP15)
+# ---------------------------------------------------------------------------
+async def get_sync_repo(doc_store: DocumentStoreDep) -> SyncRepository:
+    return SyncRepository(doc_store)
+
+
+SyncRepoDep = Annotated[SyncRepository, Depends(get_sync_repo)]
+
+
+async def get_report_sync_service(
+    doc_store: DocumentStoreDep,
+    sync_repo: SyncRepoDep,
+    study_repo: StudyRepoDep,
+    audit_service: AuditServiceDep,
+) -> ReportSyncService:
+    return ReportSyncService(doc_store, sync_repo, study_repo, audit_service)
+
+
+ReportSyncServiceDep = Annotated[ReportSyncService, Depends(get_report_sync_service)]

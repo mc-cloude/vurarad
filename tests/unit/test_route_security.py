@@ -202,11 +202,11 @@ def _studies_routes(app: FastAPI) -> list[tuple[str, str, APIRoute]]:
     ]
 
 
-def test_studies_route_count_is_six() -> None:
-    """The studies package exposes exactly six routes (§3.3–3.6)."""
+def test_studies_route_count_is_seven() -> None:
+    """The studies package exposes exactly seven routes (§3.3–3.6, §3.21.3)."""
     app = create_app()
     routes = _studies_routes(app)
-    assert len(routes) == 6, f"Expected 6 studies routes, got {len(routes)}"
+    assert len(routes) == 7, f"Expected 7 studies routes, got {len(routes)}"
 
 
 def test_studies_routes_require_auth_and_mfa() -> None:

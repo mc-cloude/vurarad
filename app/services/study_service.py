@@ -15,7 +15,7 @@ from __future__ import annotations
 import base64
 import json
 from datetime import UTC, datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from app.core.auth import AuthenticatedUser
 from app.core.errors import (
@@ -44,6 +44,9 @@ from app.repositories.study_repo import StudyRepository
 from app.services.access_policy import StudyAccessPolicy
 from app.services.audit_service import AuditService
 from app.services.signed_url_service import SignedUrlService
+
+if TYPE_CHECKING:
+    from app.services.rendition_service import QualityManifest, RenditionService
 
 
 class StudyService:
@@ -230,6 +233,43 @@ class StudyService:
             patient_key=study.patient_key,
         )
         return chunk
+
+    # -- manifest (§3.21.3 — criterion 2) ------------------------------------
+    async def get_manifest(
+        self,
+        user: AuthenticatedUser,
+        study_id: str,
+        series_uid: str,
+        rendition_service: RenditionService,
+        viewer_scope: ViewerScope | None = None,
+    ) -> QualityManifest:
+        """Build the per-quality byte-size manifest for a series (criterion 2).
+
+        All imaging PHI — including the manifest's per-instance sizes — is
+        handled identically (criterion 1): the same access policy, the same
+        ``STUDY_IMAGES_ACCESSED`` audit event, and the same erasure as the
+        pixels themselves.
+        """
+        study = await self._resolve_and_authorise(user, study_id, viewer_scope)
+        series_list = await self._study_repo.get_series_for_study(study)
+        series = _find_series(series_list, series_uid)
+        if series is None:
+            raise NotFoundError(f"Series {series_uid} not found in study {study_id}")
+        instances = sorted(series.instances, key=lambda i: i.stack_index)
+        manifest = await rendition_service.build_manifest(study_id, series_uid, instances)
+        await self._audit.record(
+            "STUDY_IMAGES_ACCESSED",
+            actor=user.uid,
+            second_factor=user.is_mfa_verified,
+            detail={
+                "studyId": study_id,
+                "seriesUid": series_uid,
+                "manifest": True,
+                "instanceCount": manifest.instance_count,
+            },
+            patient_key=study.patient_key,
+        )
+        return manifest
 
     # -- helpers -------------------------------------------------------------
     async def _resolve_and_authorise(

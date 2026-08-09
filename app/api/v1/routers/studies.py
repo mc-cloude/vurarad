@@ -21,6 +21,7 @@ from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import JSONResponse
 
 from app.api.v1.routers.studies_deps import (
+    RenditionServiceDep,
     SettingsDep,
     StudyServiceDep,
     ViewerScopeDep,
@@ -38,6 +39,7 @@ from app.models.study import (
     StudyDetail,
     WorklistEnvelope,
 )
+from app.services.rendition_service import QualityManifest
 
 router = APIRouter(
     prefix="/studies",
@@ -177,5 +179,36 @@ async def get_access_urls(
     # response.  The header is set on the response object, not in a comment.
     return JSONResponse(
         content=chunk.model_dump(by_alias=True),
+        headers={"Cache-Control": "private, no-store"},
+    )
+
+
+# ---------------------------------------------------------------------------
+# GET /studies/{studyId}/series/{seriesId}/manifest — per-quality byte sizes
+# ---------------------------------------------------------------------------
+@router.get(
+    "/{study_id}/series/{series_id}/manifest",
+    dependencies=[Depends(require_phi_capability(Capability.STUDY_READ))],
+)
+async def get_manifest(
+    study_id: str,
+    series_id: str,
+    study_service: StudyServiceDep,
+    rendition_service: RenditionServiceDep,
+    viewer_scope: ViewerScopeDep,
+    user: AuthenticatedUser = Depends(get_current_user),
+) -> JSONResponse:
+    """Per-instance byte sizes at all three quality tiers (criterion 2).
+
+    The client plans its bandwidth budget before fetching a single pixel.
+    Like every pixel-bearing response, the manifest carries
+    ``Cache-Control: private, no-store`` and writes a ``STUDY_IMAGES_ACCESSED``
+    audit event (criterion 1).
+    """
+    manifest: QualityManifest = await study_service.get_manifest(
+        user, study_id, series_id, rendition_service, viewer_scope
+    )
+    return JSONResponse(
+        content=manifest.model_dump(by_alias=True),
         headers={"Cache-Control": "private, no-store"},
     )

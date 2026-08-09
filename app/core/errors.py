@@ -118,6 +118,19 @@ class FindingsPendingError(ConflictError):
         super().__init__(message or f"{pending_count} finding(s) pending disposition")
 
 
+class ReportSignedError(ConflictError):
+    """A signed report is immutable — ``POST /reports/{id}/sync`` returns 409.
+
+    Offline draft sync applies only to ``DRAFT`` reports (criterion 5).  Once a
+    report is ``SIGNED`` it can no longer be mutated by sync; the client must
+    open an addendum instead.
+    """
+
+    code = ErrorCode.REPORT_SIGNED
+    status_code = 409
+    message = "Report is signed and cannot be modified by sync"
+
+
 class ResidencyViolationError(ApiError):
     """Pixels were processed outside the tenant's residency zone (§5.11).
 

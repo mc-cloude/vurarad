@@ -25,6 +25,7 @@ from app.repositories.base import DocumentStore, FirestoreDocumentStore
 from app.repositories.patient_repo import PatientRepository
 from app.repositories.study_repo import StudyRepository
 from app.services.audit_service import AuditMirror, AuditService
+from app.services.rendition_service import RenditionService
 from app.services.signed_url_service import SignedUrlService
 from app.services.study_service import StudyService
 from app.storage.base import ObjectStore
@@ -131,6 +132,16 @@ async def get_pixel_object_store(request: Request) -> ObjectStore:
 
 
 PixelObjectStoreDep = Annotated[ObjectStore, Depends(get_pixel_object_store)]
+
+
+# ---------------------------------------------------------------------------
+# Rendition service — three quality tiers and the derived/ lifecycle (WP15)
+# ---------------------------------------------------------------------------
+async def get_rendition_service(store: PixelObjectStoreDep) -> RenditionService:
+    return RenditionService(store)
+
+
+RenditionServiceDep = Annotated[RenditionService, Depends(get_rendition_service)]
 
 
 # ---------------------------------------------------------------------------
