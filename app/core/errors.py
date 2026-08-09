@@ -53,6 +53,12 @@ class PhiAccessForbiddenError(ApiError):
     message = "PHI access not permitted for this role"
 
 
+class NotAssignedError(ApiError):
+    code = ErrorCode.NOT_ASSIGNED
+    status_code = 403
+    message = "Study is assigned to another reader"
+
+
 class MfaRequiredError(ApiError):
     code = ErrorCode.MFA_REQUIRED
     status_code = 403
@@ -64,6 +70,24 @@ class NotFoundError(ApiError):
     code = ErrorCode.NOT_FOUND
     status_code = 404
     message = "Resource not found"
+
+
+class SearchFilterRequiredError(ApiError):
+    code = ErrorCode.SEARCH_FILTER_REQUIRED
+    status_code = 422
+    message = "At least one search filter is required"
+
+
+class InvalidQueryParameterError(ApiError):
+    code = ErrorCode.INVALID_QUERY_PARAMETER
+    status_code = 422
+    message = "Query parameter is not accepted on this route"
+
+
+class InstanceChunkTooLargeError(ApiError):
+    code = ErrorCode.INSTANCE_CHUNK_TOO_LARGE
+    status_code = 422
+    message = "Instance chunk size exceeds the maximum"
 
 
 class ConflictError(ApiError):

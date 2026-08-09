@@ -114,6 +114,15 @@ class Settings(BaseSettings):
     require_second_factor: bool = True
     token_revocation_check_seconds: int = 30
 
+    # -- signed URLs (§3.6) --------------------------------------------------
+    signed_url_ttl_seconds: int = 900  # 15 minutes
+    signed_url_chunk_default: int = 250
+    signed_url_chunk_max: int = 250
+    sign_blob_concurrency: int = 32  # semaphore ceiling
+
+    # -- worklist (§4.2) -----------------------------------------------------
+    worklist_cap: int = 200
+
     # -- CORS ----------------------------------------------------------------
     cors_allow_origins: str = ""  # comma-separated, no trailing slash
 

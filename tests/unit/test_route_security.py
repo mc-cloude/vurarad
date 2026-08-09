@@ -188,3 +188,48 @@ def test_no_route_path_contains_direct_identifier_param() -> None:
             assert f"{{{forbidden}}}" not in path, (
                 f"Route {path} contains forbidden param name: {forbidden}"
             )
+
+
+# ---------------------------------------------------------------------------
+# /api/v1/studies/* route security (WP4 — §3.3–3.6 acceptance criteria 11–15)
+# ---------------------------------------------------------------------------
+def _studies_routes(app: FastAPI) -> list[tuple[str, str, APIRoute]]:
+    """Filter to /api/v1/studies routes only."""
+    return [(m, p, r) for m, p, r in _collect_api_routes(app) if p.startswith("/api/v1/studies")]
+
+
+def test_studies_route_count_is_six() -> None:
+    """The studies package exposes exactly six routes (§3.3–3.6)."""
+    app = create_app()
+    routes = _studies_routes(app)
+    assert len(routes) == 6, f"Expected 6 studies routes, got {len(routes)}"
+
+
+def test_studies_routes_require_auth_and_mfa() -> None:
+    """Every /api/v1/studies/* route must carry get_current_user and require_mfa.
+
+    A first-factor-only token gets 403 MFA_REQUIRED on every route in this
+    package because ``require_mfa`` rejects before any capability check
+    (acceptance criterion 15).
+    """
+    app = create_app()
+    for method, path, route in _studies_routes(app):
+        names = _dep_names(route)
+        assert "get_current_user" in names, f"Route {method} {path} missing get_current_user"
+        assert "require_mfa" in names, f"Route {method} {path} missing require_mfa"
+
+
+def test_studies_routes_have_phi_capability_check() -> None:
+    """Every /api/v1/studies/* route must carry a PHI capability check.
+
+    Each route has either ``require_phi_capability`` (the ``_require`` closure)
+    or ``require_patient_identity_access`` as a route-level dependency, so an
+    admin gets 403 PHI_ACCESS_FORBIDDEN on every route (criterion 11) and a
+    viewer is denied patient-identity access (criterion 12).
+    """
+    app = create_app()
+    for method, path, route in _studies_routes(app):
+        names = _dep_names(route)
+        assert "_require" in names or "require_patient_identity_access" in names, (
+            f"Route {method} {path} missing PHI capability check"
+        )
