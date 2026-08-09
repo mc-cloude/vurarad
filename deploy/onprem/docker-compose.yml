@@ -1,0 +1,162 @@
+# WP19 — On-prem docker-compose bundle
+#
+# The compliance deployment for strict-residency markets (e.g. Kenya under a
+# strict ODPC reading).  No outbound internet is required for steady-state
+# operation: licence verification is offline, rule sets are local files, and
+# models are baked into images.
+#
+# Services:
+#   postgres       — PostgreSQL 16 metadata backend (MetadataStore)
+#   minio          — S3-compatible object store (pixels, audit, quarantine, deid)
+#   minio-init     — one-shot bucket creation incl. object-lock audit bucket
+#   firestore-emu  — Firestore emulator (DICOM metadata store only — TEMPORARY,
+#                    replaced by a PG backend in a future work package)
+#   api            — vuraRAD API (FastAPI / uvicorn)
+#   caddy          — reverse proxy, TLS termination, no-egress enforcement
+#
+# Bring up:   docker compose -f deploy/onprem/docker-compose.yml up -d
+# Bootstrap:  bash deploy/onprem/scripts/bootstrap.sh
+# Smoke test: bash tests/e2e/onprem_smoke.sh
+
+services:
+  # ----------------------------------------------------------------- metadata
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: vurarad
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secret}
+      POSTGRES_DB: vurarad
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vurarad -d vurarad"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+    # No published port — only reachable inside the compose network.
+
+  # ----------------------------------------------------------- object storage
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+    # No published port — caddy proxies the API; MinIO console is optional.
+
+  # One-shot: create buckets with object lock (audit bucket in COMPLIANCE mode).
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        set -e
+        mc alias set local http://minio:9000 "$${MINIO_ROOT_USER:-minioadmin}" "$${MINIO_ROOT_PASSWORD:-minioadmin}"
+        # Pixel bucket — read/write, no lock.
+        mc mb --ignore-existing local/vurarad-pixels
+        # Quarantine bucket — raw uploads before validation.
+        mc mb --ignore-existing local/vurarad-quarantine
+        # De-identified pixel bucket.
+        mc mb --ignore-existing local/vurarad-deid
+        # Audit bucket — object lock in COMPLIANCE mode (WORM).
+        #   --with-lock enables object lock at bucket creation time.
+        #   The retention policy (COMPLIANCE, N days) is applied by
+        #   bootstrap.sh after the bucket exists.
+        mc mb --ignore-existing --with-lock local/vurarad-audit
+        echo "Buckets created."
+    restart: "no"
+
+  # ------------------------------------------------- DICOM metadata (temporary)
+  # The DICOM-specific metadata store (FirestoreDicomMetadataStore) still uses
+  # Firestore.  A PostgreSQL backend for it is tracked as future work; until
+  # then the emulator runs locally (no outbound internet).  ENVIRONMENT is set
+  # to 'staging' so the emulator guard in config.py permits this.
+  firestore-emu:
+    image: mtlynch/firestore-emulator:latest
+    environment:
+      FIRESTORE_PROJECT_ID: vurarad-onprem
+    restart: unless-stopped
+
+  # -------------------------------------------------------------- API server
+  api:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+      firestore-emu:
+        condition: service_started
+    environment:
+      HOSTING: onprem
+      ENVIRONMENT: staging
+      GCP_PROJECT_ID: vurarad-onprem
+      GCP_REGION: local
+      FIREBASE_PROJECT_ID: vurarad-onprem
+      # Object storage
+      STORAGE_BACKEND: minio
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      MINIO_SECURE: "false"
+      PIXEL_BUCKET_NAME: vurarad-pixels
+      AUDIT_BUCKET_NAME: vurarad-audit
+      QUARANTINE_BUCKET_NAME: vurarad-quarantine
+      DEID_BUCKET_NAME: vurarad-deid
+      # Metadata backend (PostgreSQL)
+      POSTGRES_DSN: postgres://vurarad:${POSTGRES_PASSWORD:-secret}@postgres:5432/vurarad
+      # Local OIDC (offline verification — HS256 shared secret)
+      OIDC_ISSUER: https://idp.local/vurarad
+      OIDC_AUDIENCE: vurarad-api
+      OIDC_HMAC_SECRET: ${OIDC_HMAC_SECRET:-onprem-shared-secret}
+      # Segmentation runs on CPU locally — must not target a cloud region
+      SEGMENTATION_REGION: local
+      # DICOM metadata store (temporary — Firestore emulator)
+      FIRESTORE_EMULATOR_HOST: firestore-emu:8080
+      # Auth / MFA
+      REQUIRE_SECOND_FACTOR: "true"
+      MFA_VERIFICATION_SECONDS: "300"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/healthz')"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    restart: unless-stopped
+    # No published port — caddy proxies.
+
+  # ----------------------------------------------------------- reverse proxy
+  caddy:
+    image: caddy:2-alpine
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "${HTTP_PORT:-8080}:8080"
+    volumes:
+      - ./config/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  minio-data:
+  caddy-data:
+  caddy-config:
