@@ -294,9 +294,7 @@ class TestEvidenceLookup:
         )
         assert resp.status_code == 404
 
-    def test_viewer_denied(
-        self, client: TestClient, doc_store: InMemoryDocumentStore
-    ) -> None:
+    def test_viewer_denied(self, client: TestClient, doc_store: InMemoryDocumentStore) -> None:
         client.app.state.token_verifier = FakeTokenVerifier(
             default_user=make_user(role=Role.VIEWER, mfa_state=SecondFactorState.VERIFIED)
         )

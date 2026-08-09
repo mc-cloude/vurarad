@@ -244,9 +244,7 @@ def test_studies_routes_have_phi_capability_check() -> None:
 # ---------------------------------------------------------------------------
 def _evidence_routes(app: FastAPI) -> list[tuple[str, str, APIRoute]]:
     """Filter to /api/v1/evidence routes only."""
-    return [
-        (m, p, r) for m, p, r in _collect_api_routes(app) if p.startswith("/api/v1/evidence")
-    ]
+    return [(m, p, r) for m, p, r in _collect_api_routes(app) if p.startswith("/api/v1/evidence")]
 
 
 _EVIDENCE_CAPABILITIES: dict[tuple[str, str], str] = {

@@ -97,15 +97,12 @@ def _validate_rule_set(data: dict[str, Any], *, source: str) -> RuleSet:
 
     # -- review required (criterion 3) ---------------------------------------
     if not rule_set.reviewed_by or not rule_set.reviewed_at:
-        raise RuleSetLoadError(
-            f"{source}: rule set {rule_set.id!r} lacks reviewedBy or reviewedAt"
-        )
+        raise RuleSetLoadError(f"{source}: rule set {rule_set.id!r} lacks reviewedBy or reviewedAt")
 
     # -- finding type known --------------------------------------------------
     if rule_set.finding_type not in FINDING_TYPE_ATTRIBUTES:
         raise RuleSetLoadError(
-            f"{source}: rule set {rule_set.id!r} has unknown findingType "
-            f"{rule_set.finding_type!r}"
+            f"{source}: rule set {rule_set.id!r} has unknown findingType {rule_set.finding_type!r}"
         )
     known_attrs = attribute_names(rule_set.finding_type)
 

@@ -163,9 +163,7 @@ class EvidenceService:
         matches = RuleEngine.evaluate(rule_set, validated)
         match = next((m for m in matches if m.rule_id == rule_id), None)
         if match is None:
-            raise ConflictError(
-                f"Evidence rule {rule_id!r} does not match the supplied attributes"
-            )
+            raise ConflictError(f"Evidence rule {rule_id!r} does not match the supplied attributes")
 
         ref = EvidenceRef(
             evidence_id=f"ev_{ULID()}",

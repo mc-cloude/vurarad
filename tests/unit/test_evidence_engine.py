@@ -106,7 +106,7 @@ class TestSafeEvaluatorRejection:
             evaluate_logic("a ==", {"a": 1})
 
     def test_logic_names_extracts_identifiers(self) -> None:
-        assert logic_names("a == 1 and b > 2 or c in [\"x\"]") == {"a", "b", "c"}
+        assert logic_names('a == 1 and b > 2 or c in ["x"]') == {"a", "b", "c"}
 
 
 # ---------------------------------------------------------------------------
@@ -147,9 +147,7 @@ class TestRuleEngineEvaluate:
         attrs = {"t": "solid", "d": 7, "risk": "low"}
         first = RuleEngine.evaluate(rs, attrs)
         for _ in range(5):
-            assert [m.rule_id for m in RuleEngine.evaluate(rs, attrs)] == [
-                m.rule_id for m in first
-            ]
+            assert [m.rule_id for m in RuleEngine.evaluate(rs, attrs)] == [m.rule_id for m in first]
 
     def test_not_applicable_when_overrides_match(self) -> None:
         rs = _rule_set(
@@ -226,9 +224,7 @@ class TestBundledRuleSets:
     def test_adrenal_lipid_rich_adenoma(self) -> None:
         rs = default_registry().get("acr-incidental-adrenal")
         attrs = validate_attributes("adrenal_incidental", {"diameterMm": 25, "unenhancedHu": 4})
-        assert [m.rule_id for m in RuleEngine.evaluate(rs, attrs)] == [
-            "adrenal-lipid-rich-adenoma"
-        ]
+        assert [m.rule_id for m in RuleEngine.evaluate(rs, attrs)] == ["adrenal-lipid-rich-adenoma"]
 
     def test_adrenal_tiny_skips_large_or_growing(self) -> None:
         rs = default_registry().get("acr-incidental-adrenal")
