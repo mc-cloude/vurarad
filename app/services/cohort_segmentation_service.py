@@ -135,9 +135,7 @@ class CohortSegmentationService:
             versions = list(existing.versions)
 
         next_version = current_version + 1
-        mask_object_path = (
-            f"{self._deid_bucket}/{cohort_id}/{subject_id}/seg/v{next_version}.nii"
-        )
+        mask_object_path = f"{self._deid_bucket}/{cohort_id}/{subject_id}/seg/v{next_version}.nii"
 
         # MONAI dispatch — produce the mask, write it to a versioned path.
         if source == SegmentationSource.MONAI:

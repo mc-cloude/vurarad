@@ -52,9 +52,9 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 # ---------------------------------------------------------------------------
 def test_research_id_prefixes_are_the_expected_frozen_set() -> None:
     """The eight research identifier prefixes are frozen and complete."""
-    assert frozenset(
-        {"co_", "cs_", "sg_", "fr_", "ls_", "an_", "ex_", "rd_"}
-    ) == RESEARCH_ID_PREFIXES
+    assert (
+        frozenset({"co_", "cs_", "sg_", "fr_", "ls_", "an_", "ex_", "rd_"}) == RESEARCH_ID_PREFIXES
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -109,11 +109,7 @@ def test_no_cohort_model_has_study_id_field(model_cls: type) -> None:
     """No cohort response model declares ``study_id`` (snake) or ``studyId``."""
     field_names = set(model_cls.model_fields.keys())
     assert "study_id" not in field_names, f"{model_cls.__name__} declares study_id"
-    aliases = {
-        info.alias
-        for info in model_cls.model_fields.values()
-        if info.alias is not None
-    }
+    aliases = {info.alias for info in model_cls.model_fields.values() if info.alias is not None}
     assert "studyId" not in aliases, f"{model_cls.__name__} aliases studyId"
 
 
@@ -122,11 +118,7 @@ def test_no_cohort_model_has_patient_key_field(model_cls: type) -> None:
     """No cohort response model declares ``patient_key`` or ``patientKey``."""
     field_names = set(model_cls.model_fields.keys())
     assert "patient_key" not in field_names, f"{model_cls.__name__} declares patient_key"
-    aliases = {
-        info.alias
-        for info in model_cls.model_fields.values()
-        if info.alias is not None
-    }
+    aliases = {info.alias for info in model_cls.model_fields.values() if info.alias is not None}
     assert "patientKey" not in aliases, f"{model_cls.__name__} aliases patientKey"
 
 
@@ -335,7 +327,5 @@ def test_no_radiogenomics_markers_in_app() -> None:
         text=True,
     )
     # grep exits 1 when nothing matched — that is the desired outcome.
-    assert result.returncode != 0, (
-        f"EGFR/KRAS markers still present in app/:\n{result.stdout}"
-    )
+    assert result.returncode != 0, f"EGFR/KRAS markers still present in app/:\n{result.stdout}"
     assert result.stdout == ""

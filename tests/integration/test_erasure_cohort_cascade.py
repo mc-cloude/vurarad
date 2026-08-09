@@ -99,9 +99,7 @@ def _build_subject_service(
     )
 
 
-def _seed_research_artifacts(
-    doc_store: InMemoryDocumentStore, subject_id: str
-) -> None:
+def _seed_research_artifacts(doc_store: InMemoryDocumentStore, subject_id: str) -> None:
     # A label for the subject (research labels collection).
     asyncio.run(
         doc_store.set(
@@ -150,7 +148,10 @@ class TestErasureCascade:
         )
         asyncio.run(
             seg_service.create_or_edit_segmentation(
-                user, cohort_id, subject_id, source=SegmentationSource.MONAI,
+                user,
+                cohort_id,
+                subject_id,
+                source=SegmentationSource.MONAI,
             )
         )
 
@@ -160,9 +161,7 @@ class TestErasureCascade:
         # Sanity: artifacts exist before erasure.
         assert asyncio.run(doc_store.get("cohort_subjects", subject_id)) is not None
         assert asyncio.run(doc_store.get(DEID_LINKS_COLLECTION, subject_id)) is not None
-        feature_doc = asyncio.run(
-            doc_store.get(RESEARCH_FEATURES_COLLECTION, feature.feature_id)
-        )
+        feature_doc = asyncio.run(doc_store.get(RESEARCH_FEATURES_COLLECTION, feature.feature_id))
         assert feature_doc is not None
         assert asyncio.run(doc_store.get(RESEARCH_LABELS_COLLECTION, "ls_1")) is not None
         analysis_before = asyncio.run(doc_store.get(ANALYSES_COLLECTION, "an_1"))
@@ -204,9 +203,7 @@ class TestErasureCascade:
             is None
         )
 
-    def test_erase_without_patient_erase_is_denied(
-        self, doc_store: InMemoryDocumentStore
-    ) -> None:
+    def test_erase_without_patient_erase_is_denied(self, doc_store: InMemoryDocumentStore) -> None:
         audit = AuditService(InMemoryAuditMirror())
         cohort_id = _seed_cohort(doc_store)
         subject_service = _build_subject_service(doc_store, audit)
@@ -231,15 +228,11 @@ class TestErasureCascade:
             }
         )
         with pytest.raises(PermissionDeniedError):
-            asyncio.run(
-                erasure.erase_patient(PATIENT_KEY, capabilities=cohort_only, actor=user)
-            )
+            asyncio.run(erasure.erase_patient(PATIENT_KEY, capabilities=cohort_only, actor=user))
         # Nothing was removed.
         assert asyncio.run(doc_store.get("cohort_subjects", subject.subject_id)) is not None
 
-    def test_erase_unknown_patient_is_a_noop(
-        self, doc_store: InMemoryDocumentStore
-    ) -> None:
+    def test_erase_unknown_patient_is_a_noop(self, doc_store: InMemoryDocumentStore) -> None:
         audit = AuditService(InMemoryAuditMirror())
         erasure = ErasureService(
             CohortRepository(doc_store),
@@ -248,9 +241,7 @@ class TestErasureCascade:
             audit,
         )
         result = asyncio.run(
-            erasure.erase_patient(
-                "pk_nobody", capabilities=frozenset({Capability.PATIENT_ERASE})
-            )
+            erasure.erase_patient("pk_nobody", capabilities=frozenset({Capability.PATIENT_ERASE}))
         )
         assert result.subjects_removed == 0
         assert result.links_removed == 0

@@ -148,9 +148,7 @@ def audit_mirror() -> InMemoryAuditMirror:
 
 
 @pytest.fixture
-def client(
-    doc_store: InMemoryDocumentStore, audit_mirror: InMemoryAuditMirror
-) -> TestClient:
+def client(doc_store: InMemoryDocumentStore, audit_mirror: InMemoryAuditMirror) -> TestClient:
     app = _build_app(doc_store, audit_mirror)
     return TestClient(app)
 
@@ -349,9 +347,7 @@ class TestReviewPendingGate:
         asyncio.run(CohortRepository(doc_store).create_cohort(cohort))
         asyncio.run(doc_store.set("studies", "st_test", _study_doc()))
 
-        subject = asyncio.run(
-            subject_service.add_from_worklist(user, "co_1", "st_test")
-        )
+        subject = asyncio.run(subject_service.add_from_worklist(user, "co_1", "st_test"))
         assert subject.status == CohortSubjectStatus.PENDING_REVIEW
 
         # activate blocked (criterion 3)
@@ -382,22 +378,14 @@ class TestReviewPendingGate:
         )
         asyncio.run(CohortRepository(doc_store).create_cohort(cohort))
         asyncio.run(doc_store.set("studies", "st_test", _study_doc()))
-        subject = asyncio.run(
-            subject_service.add_from_worklist(user, "co_1", "st_test")
-        )
+        subject = asyncio.run(subject_service.add_from_worklist(user, "co_1", "st_test"))
         assert subject.status == CohortSubjectStatus.PENDING_REVIEW
 
-        asyncio.run(
-            subject_service.resolve_review_item(user, "co_1", subject.subject_id, "ri_1")
-        )
-        activated = asyncio.run(
-            subject_service.activate_subject(user, "co_1", subject.subject_id)
-        )
+        asyncio.run(subject_service.resolve_review_item(user, "co_1", subject.subject_id, "ri_1"))
+        activated = asyncio.run(subject_service.activate_subject(user, "co_1", subject.subject_id))
         assert activated.status == CohortSubjectStatus.ACTIVE
 
-        feature = asyncio.run(
-            subject_service.extract_features(user, "co_1", subject.subject_id)
-        )
+        feature = asyncio.run(subject_service.extract_features(user, "co_1", subject.subject_id))
         assert feature.feature_id.startswith("fr_")
         assert feature.subject_id == subject.subject_id
 
@@ -481,9 +469,7 @@ class TestAuthAndMfa:
     def test_first_factor_only_returns_403_mfa_required(
         self, doc_store: InMemoryDocumentStore, audit_mirror: InMemoryAuditMirror
     ) -> None:
-        app = _build_app(
-            doc_store, audit_mirror, mfa_state=SecondFactorState.ENROLLED
-        )
+        app = _build_app(doc_store, audit_mirror, mfa_state=SecondFactorState.ENROLLED)
         client = TestClient(app)
         r = client.get("/api/v1/cohorts", headers=_auth())
         assert r.status_code == 403

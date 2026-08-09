@@ -87,9 +87,7 @@ class CohortRepository:
             return None
         return CohortSegmentation.model_validate(doc)
 
-    async def find_segmentation_for_subject(
-        self, subject_id: str
-    ) -> CohortSegmentation | None:
+    async def find_segmentation_for_subject(self, subject_id: str) -> CohortSegmentation | None:
         """Return the segmentation aggregate for a subject, if any."""
         rows = await self._store.query(
             COHORT_SEGMENTATIONS_COLLECTION, where=[("subjectId", "==", subject_id)]

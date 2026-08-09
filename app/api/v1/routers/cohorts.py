@@ -192,9 +192,7 @@ async def list_cohorts(
     cohort_service: CohortServiceDep,
 ) -> JSONResponse:
     cohorts = await cohort_service.list_cohorts()
-    return JSONResponse(
-        content={"items": [c.model_dump(by_alias=True) for c in cohorts]}
-    )
+    return JSONResponse(content={"items": [c.model_dump(by_alias=True) for c in cohorts]})
 
 
 # ---------------------------------------------------------------------------

@@ -36,9 +36,7 @@ def _bears_research_prefix(value: str) -> bool:
         return False
     components = value.replace("\\", "/").split("/")
     return any(
-        component.startswith(prefix)
-        for component in components
-        for prefix in RESEARCH_ID_PREFIXES
+        component.startswith(prefix) for component in components for prefix in RESEARCH_ID_PREFIXES
     )
 
 

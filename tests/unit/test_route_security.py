@@ -244,11 +244,7 @@ def test_studies_routes_have_phi_capability_check() -> None:
 # ---------------------------------------------------------------------------
 def _cohort_routes(app: FastAPI) -> list[tuple[str, str, APIRoute]]:
     """Filter to /api/v1/cohorts routes only."""
-    return [
-        (m, p, r)
-        for m, p, r in _collect_api_routes(app)
-        if p.startswith("/api/v1/cohorts")
-    ]
+    return [(m, p, r) for m, p, r in _collect_api_routes(app) if p.startswith("/api/v1/cohorts")]
 
 
 _COHORT_CAPABILITIES: dict[tuple[str, str], str] = {

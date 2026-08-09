@@ -29,9 +29,7 @@ def _assert_patient_erase(capabilities: frozenset[Capability]) -> None:
     lacking ``patient:erase`` is rejected without touching the collection.
     """
     if Capability.PATIENT_ERASE not in capabilities:
-        raise PermissionDeniedError(
-            "Reading deid_links requires the patient:erase capability"
-        )
+        raise PermissionDeniedError("Reading deid_links requires the patient:erase capability")
 
 
 class DeidLinkRepository:

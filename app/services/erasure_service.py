@@ -138,9 +138,7 @@ class ErasureService:
 
     async def _mark_analyses_stale(self, subject_id: str) -> int:
         """Mark every analysis for ``subject_id`` ``STALE_SUBJECT_REMOVED``."""
-        rows = await self._store.query(
-            ANALYSES_COLLECTION, where=[("subjectId", "==", subject_id)]
-        )
+        rows = await self._store.query(ANALYSES_COLLECTION, where=[("subjectId", "==", subject_id)])
         for doc_id, doc in rows:
             doc["status"] = AnalysisStatus.STALE_SUBJECT_REMOVED.value
             await self._store.set(ANALYSES_COLLECTION, doc_id, doc)
