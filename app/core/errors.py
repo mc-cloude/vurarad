@@ -131,6 +131,19 @@ class ResidencyViolationError(ApiError):
     message = "Residency violation: data processed outside the tenant's zone"
 
 
+class UnknownAdapterError(ApiError):
+    """The requested ingest adapter name/version is not registered.
+
+    Raised by the findings-ingest registry when ``adapterName`` /
+    ``adapterVersion`` do not resolve to a pinned adapter (§3.15.4).  Only
+    registered, version-pinned adapters may ingest findings.
+    """
+
+    code = ErrorCode.UNKNOWN_ADAPTER
+    status_code = 422
+    message = "Unknown ingest adapter"
+
+
 class AuditStoreNotImmutableError(ApiError):
     code = ErrorCode.AUDIT_STORE_NOT_IMMUTABLE
     status_code = 503

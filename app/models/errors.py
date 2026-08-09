@@ -35,6 +35,10 @@ class ErrorCode(StrEnum):
     REPORT_NOT_MODIFIABLE = "REPORT_NOT_MODIFIABLE"
     SIGNING_REQUIRES_FRESH_MFA = "SIGNING_REQUIRES_FRESH_MFA"
 
+    # -- cleared-AI ingest ----------------------------------------------------
+    NO_CLEARANCE_REFERENCE = "NO_CLEARANCE_REFERENCE"
+    UNKNOWN_ADAPTER = "UNKNOWN_ADAPTER"
+
     # -- upstream ------------------------------------------------------------
     UPSTREAM_UNAVAILABLE = "UPSTREAM_UNAVAILABLE"
     AI_UNAVAILABLE = "AI_UNAVAILABLE"

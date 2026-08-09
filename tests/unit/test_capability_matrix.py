@@ -66,12 +66,30 @@ def test_radiologist_capabilities() -> None:
             Capability.REPORT_ADDENDUM,
             Capability.IMAGING_ACCESS,
             Capability.AI_DRAFT,
+            Capability.FINDINGS_INGEST,
             Capability.BREAK_GLASS,
             Capability.RESEARCH_COHORT_CREATE,
             Capability.RESEARCH_FEATURES_READ,
             Capability.RESEARCH_EXPORT,
         }
     )
+
+
+# ---------------------------------------------------------------------------
+# findings:ingest — PHI capability, admin does not hold it (criterion 8)
+# ---------------------------------------------------------------------------
+def test_findings_ingest_is_phi_capability() -> None:
+    assert is_phi_capability(Capability.FINDINGS_INGEST) is True
+
+
+def test_admin_does_not_hold_findings_ingest() -> None:
+    assert Capability.FINDINGS_INGEST not in ROLE_CAPABILITIES[Role.ADMIN]
+    assert has_capability(Role.ADMIN, Capability.FINDINGS_INGEST) is False
+
+
+def test_radiologist_holds_findings_ingest() -> None:
+    assert Capability.FINDINGS_INGEST in ROLE_CAPABILITIES[Role.RADIOLOGIST]
+    assert has_capability(Role.RADIOLOGIST, Capability.FINDINGS_INGEST) is True
 
 
 # ---------------------------------------------------------------------------

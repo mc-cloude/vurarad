@@ -28,6 +28,7 @@ class Capability(StrEnum):
     IMAGING_ACCESS = "imaging:access"
     AI_DRAFT = "ai:draft"
     AI_FULL = "ai:full"
+    FINDINGS_INGEST = "findings:ingest"
 
     # -- administration ------------------------------------------------------
     AUDIT_READ = "audit:read"
@@ -58,6 +59,7 @@ PHI_CAPABILITIES: frozenset[Capability] = frozenset(
         Capability.IMAGING_ACCESS,
         Capability.AI_DRAFT,
         Capability.AI_FULL,
+        Capability.FINDINGS_INGEST,
         Capability.COMPLIANCE_PURGE,
         Capability.BREAK_GLASS,
         Capability.RESEARCH_COHORT_CREATE,
@@ -108,6 +110,7 @@ ROLE_CAPABILITIES: dict[Role, frozenset[Capability]] = {
             Capability.REPORT_ADDENDUM,
             Capability.IMAGING_ACCESS,
             Capability.AI_DRAFT,
+            Capability.FINDINGS_INGEST,
             Capability.BREAK_GLASS,
             Capability.RESEARCH_COHORT_CREATE,
             Capability.RESEARCH_FEATURES_READ,
