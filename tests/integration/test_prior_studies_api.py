@@ -192,9 +192,7 @@ def _make_app(
 
     app = create_app()
     app.state.token_verifier = FakeTokenVerifier(
-        default_user=make_user(
-            uid=default_uid, role=default_role, mfa_state=mfa_state
-        )
+        default_user=make_user(uid=default_uid, role=default_role, mfa_state=mfa_state)
     )
     app.state.audit_object_store = StubAuditStore(locked=True)
     app.state.document_store = doc_store
@@ -204,9 +202,7 @@ def _make_app(
 
 
 @pytest.fixture
-def client(
-    doc_store: InMemoryDocumentStore, audit_mirror: InMemoryAuditMirror
-) -> TestClient:
+def client(doc_store: InMemoryDocumentStore, audit_mirror: InMemoryAuditMirror) -> TestClient:
     _seed_priors(doc_store)
     return TestClient(_make_app(doc_store, audit_mirror))
 
@@ -371,11 +367,7 @@ class TestMfaEnforcement:
         audit_mirror: InMemoryAuditMirror,
     ) -> None:
         _seed_priors(doc_store)
-        c = TestClient(
-            _make_app(
-                doc_store, audit_mirror, mfa_state=SecondFactorState.ENROLLED
-            )
-        )
+        c = TestClient(_make_app(doc_store, audit_mirror, mfa_state=SecondFactorState.ENROLLED))
         r = c.get("/api/v1/studies/st_current/priors", headers=_auth())
         assert r.status_code == 403
         assert r.json()["error"]["code"] == "MFA_REQUIRED"

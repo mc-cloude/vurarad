@@ -111,9 +111,7 @@ class TemplateService:
 
     def __init__(self, templates_dir: Path | None = None) -> None:
         self._dir = templates_dir if templates_dir is not None else _TEMPLATES_DIR
-        self._by_id: dict[str, _TemplateDef] = {
-            d.template_id: d for d in _TEMPLATE_DEFS
-        }
+        self._by_id: dict[str, _TemplateDef] = {d.template_id: d for d in _TEMPLATE_DEFS}
         self._content_cache: dict[str, str] = {}
 
     async def list_templates(

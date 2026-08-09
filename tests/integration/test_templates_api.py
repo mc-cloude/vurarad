@@ -154,21 +154,13 @@ class TestRetrieval:
 # Cross-role invariants (criterion 3) — identical response for every role
 # ---------------------------------------------------------------------------
 class TestCrossRoleInvariance:
-    def test_catalogue_identical_for_radiologist_and_viewer(
-        self, client: TestClient
-    ) -> None:
+    def test_catalogue_identical_for_radiologist_and_viewer(self, client: TestClient) -> None:
         rad = client.get("/api/v1/report-templates", headers=_auth("rad-token")).json()
-        viewer = client.get(
-            "/api/v1/report-templates", headers=_auth("viewer-token")
-        ).json()
+        viewer = client.get("/api/v1/report-templates", headers=_auth("viewer-token")).json()
         assert rad == viewer
 
-    def test_single_template_identical_for_radiologist_and_viewer(
-        self, client: TestClient
-    ) -> None:
-        rad = client.get(
-            "/api/v1/report-templates/chest_ct", headers=_auth("rad-token")
-        ).json()
+    def test_single_template_identical_for_radiologist_and_viewer(self, client: TestClient) -> None:
+        rad = client.get("/api/v1/report-templates/chest_ct", headers=_auth("rad-token")).json()
         viewer = client.get(
             "/api/v1/report-templates/chest_ct", headers=_auth("viewer-token")
         ).json()
@@ -182,9 +174,7 @@ class TestCrossRoleInvariance:
         assert r.json()["error"]["code"] == "PERMISSION_DENIED"
 
     def test_admin_denied_on_retrieval(self, client: TestClient) -> None:
-        r = client.get(
-            "/api/v1/report-templates/chest_ct", headers=_auth("admin-token")
-        )
+        r = client.get("/api/v1/report-templates/chest_ct", headers=_auth("admin-token"))
         assert r.status_code == 403
         assert r.json()["error"]["code"] == "PERMISSION_DENIED"
 
@@ -199,9 +189,7 @@ class TestAuthEnforcement:
         assert r.json()["error"]["code"] == "MISSING_TOKEN"
 
     def test_first_factor_only_returns_mfa_required(self, client: TestClient) -> None:
-        r = client.get(
-            "/api/v1/report-templates", headers=_auth("rad-first-factor")
-        )
+        r = client.get("/api/v1/report-templates", headers=_auth("rad-first-factor"))
         assert r.status_code == 403
         assert r.json()["error"]["code"] == "MFA_REQUIRED"
 
@@ -220,7 +208,5 @@ class TestDeterminism:
         assert a == b
 
     def test_catalogue_shape_is_stable(self, client: TestClient) -> None:
-        body: Any = client.get(
-            "/api/v1/report-templates", headers=_auth()
-        ).json()
+        body: Any = client.get("/api/v1/report-templates", headers=_auth()).json()
         assert set(body.keys()) == {"schemaVersion", "templates"}

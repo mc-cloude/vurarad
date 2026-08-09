@@ -350,9 +350,7 @@ def _series_summary_from_model(series: Series) -> SeriesSummary:
     existing one-entry-per-instance shape with ``frameIndex`` null, so the
     wire contract for ordinary CT/MR series is unchanged.
     """
-    is_multi_frame = series.is_multi_frame or any(
-        i.number_of_frames > 1 for i in series.instances
-    )
+    is_multi_frame = series.is_multi_frame or any(i.number_of_frames > 1 for i in series.instances)
     instances: list[InstanceGeometry] = []
     total_bytes = 0
     if is_multi_frame:

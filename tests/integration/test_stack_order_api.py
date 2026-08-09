@@ -560,9 +560,7 @@ class TestMultiFrameGeometryOnWire:
         # numberOfFrames is the parent instance frame count on every frame.
         assert [f["numberOfFrames"] for f in frames] == [4, 4, 4, 4, 3, 3, 3]
         # Each frame carries the SOP instance UID of its parent object.
-        assert [f["sopInstanceUid"] for f in frames] == ["1.2.3.100"] * 4 + [
-            "1.2.3.101"
-        ] * 3
+        assert [f["sopInstanceUid"] for f in frames] == ["1.2.3.100"] * 4 + ["1.2.3.101"] * 3
 
     def test_single_frame_series_has_no_per_frame_functional_groups(
         self, client: TestClient, doc_store: InMemoryDocumentStore
