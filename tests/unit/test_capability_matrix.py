@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from app.core.capabilities import (
+    CLINICAL_CAPABILITIES,
     PHI_CAPABILITIES,
     ROLE_CAPABILITIES,
     Capability,
@@ -110,3 +111,58 @@ def test_has_capability_true_false() -> None:
 def test_is_phi_capability() -> None:
     assert is_phi_capability(Capability.STUDY_READ) is True
     assert is_phi_capability(Capability.AUDIT_READ) is False
+
+
+# ---------------------------------------------------------------------------
+# WP17 — researcher role (research/clinical barrier, criterion 8)
+# ---------------------------------------------------------------------------
+_COHORT_CAPABILITIES = frozenset(
+    {
+        Capability.COHORT_CREATE,
+        Capability.COHORT_READ,
+        Capability.COHORT_WRITE,
+        Capability.COHORT_SUBJECT_ADD,
+        Capability.COHORT_SEGMENTATION,
+    }
+)
+
+
+def test_researcher_capabilities() -> None:
+    assert ROLE_CAPABILITIES[Role.RESEARCHER] == frozenset(
+        {
+            Capability.COHORT_CREATE,
+            Capability.COHORT_READ,
+            Capability.COHORT_WRITE,
+            Capability.COHORT_SUBJECT_ADD,
+            Capability.COHORT_SEGMENTATION,
+            Capability.RESEARCH_FEATURES_READ,
+            Capability.RESEARCH_EXPORT,
+        }
+    )
+
+
+def test_researcher_has_zero_clinical_capabilities() -> None:
+    """researcher ∩ CLINICAL == ∅ — the barrier is structural (criterion 8)."""
+    assert ROLE_CAPABILITIES[Role.RESEARCHER] & CLINICAL_CAPABILITIES == frozenset()
+
+
+def test_researcher_lacks_patient_erase() -> None:
+    """cohort:* grants no deid_links access — researcher lacks patient:erase."""
+    assert Capability.PATIENT_ERASE not in ROLE_CAPABILITIES[Role.RESEARCHER]
+
+
+def test_cohort_capabilities_are_not_phi() -> None:
+    """cohort:* capabilities are de-identified research, not PHI."""
+    for cap in _COHORT_CAPABILITIES:
+        assert cap not in PHI_CAPABILITIES
+
+
+def test_patient_erase_is_phi() -> None:
+    """patient:erase re-identifies, so it is PHI-level and withheld from admin."""
+    assert Capability.PATIENT_ERASE in PHI_CAPABILITIES
+    assert Capability.PATIENT_ERASE not in ROLE_CAPABILITIES[Role.ADMIN]
+
+
+def test_clinical_capabilities_are_a_subset_of_all_capabilities() -> None:
+    for cap in CLINICAL_CAPABILITIES:
+        assert isinstance(cap, Capability)

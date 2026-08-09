@@ -69,6 +69,7 @@ def create_app() -> FastAPI:
 
     # -- routers -------------------------------------------------------------
     from app.api.v1.routers.auth import router as auth_router
+    from app.api.v1.routers.cohorts import router as cohorts_router
     from app.api.v1.routers.dictation import router as dictation_router
     from app.api.v1.routers.findings import router as findings_router
     from app.api.v1.routers.health import router as health_router
@@ -83,6 +84,7 @@ def create_app() -> FastAPI:
     app.include_router(uploads_router, prefix="/api/v1")
     app.include_router(ingest_router, prefix="/api/v1")
     app.include_router(studies_router, prefix="/api/v1")
+    app.include_router(cohorts_router, prefix="/api/v1")
     app.include_router(findings_router, prefix="/api/v1")
     app.include_router(dictation_router, prefix="/api/v1")
     app.include_router(preprocessing_router, prefix="/api/v1")

@@ -42,6 +42,20 @@ class Capability(StrEnum):
     RESEARCH_FEATURES_READ = "research:features:read"
     RESEARCH_EXPORT = "research:export"
 
+    # -- cohort workbench (WP17) — de-identified, NOT PHI -------------------
+    COHORT_CREATE = "cohort:create"
+    COHORT_READ = "cohort:read"
+    COHORT_WRITE = "cohort:write"
+    COHORT_SUBJECT_ADD = "cohort:subject:add"
+    COHORT_SEGMENTATION = "cohort:segmentation"
+
+    # -- compliance ----------------------------------------------------------
+    # ``patient:erase`` is the ONLY capability that may read the write-restricted
+    # ``deid_links`` collection (the pseudonym->patientKey map).  It re-identifies
+    # a subject, so it is PHI-level and is deliberately withheld from the
+    # ``researcher`` role (cohort:* grants no access to it).
+    PATIENT_ERASE = "patient:erase"
+
 
 # ---------------------------------------------------------------------------
 PHI_CAPABILITIES: frozenset[Capability] = frozenset(
@@ -63,6 +77,34 @@ PHI_CAPABILITIES: frozenset[Capability] = frozenset(
         Capability.RESEARCH_COHORT_CREATE,
         Capability.RESEARCH_FEATURES_READ,
         Capability.RESEARCH_EXPORT,
+        Capability.PATIENT_ERASE,
+    }
+)
+
+
+# ---------------------------------------------------------------------------
+# Clinical capabilities — the set the ``researcher`` role must NOT hold.
+# ``cohort:*`` capabilities are deliberately absent (they are research, not
+# clinical) so the research/clinical barrier is expressible as a set
+# intersection.
+# ---------------------------------------------------------------------------
+CLINICAL_CAPABILITIES: frozenset[Capability] = frozenset(
+    {
+        Capability.STUDY_READ,
+        Capability.STUDY_WRITE,
+        Capability.STUDY_IMPORT,
+        Capability.STUDY_DELETE,
+        Capability.STUDY_SEARCH,
+        Capability.STUDY_ANNOTATE,
+        Capability.REPORT_READ,
+        Capability.REPORT_WRITE,
+        Capability.REPORT_SIGN,
+        Capability.REPORT_ADDENDUM,
+        Capability.REPORT_DELETE,
+        Capability.IMAGING_ACCESS,
+        Capability.AI_DRAFT,
+        Capability.AI_FULL,
+        Capability.BREAK_GLASS,
     }
 )
 
@@ -74,6 +116,7 @@ class Role(StrEnum):
     ADMIN = "admin"
     VIEWER = "viewer"
     RADIOLOGIST = "radiologist"
+    RESEARCHER = "researcher"
 
 
 # ---------------------------------------------------------------------------
@@ -114,6 +157,17 @@ ROLE_CAPABILITIES: dict[Role, frozenset[Capability]] = {
             Capability.RESEARCH_EXPORT,
         }
     ),
+    Role.RESEARCHER: frozenset(
+        {
+            Capability.COHORT_CREATE,
+            Capability.COHORT_READ,
+            Capability.COHORT_WRITE,
+            Capability.COHORT_SUBJECT_ADD,
+            Capability.COHORT_SEGMENTATION,
+            Capability.RESEARCH_FEATURES_READ,
+            Capability.RESEARCH_EXPORT,
+        }
+    ),
 }
 
 # ---------------------------------------------------------------------------
@@ -134,6 +188,17 @@ assert Capability.STUDY_READ not in ROLE_CAPABILITIES[Role.ADMIN]
 # Viewer must NOT be able to write or sign
 assert Capability.REPORT_WRITE not in ROLE_CAPABILITIES[Role.VIEWER]
 assert Capability.REPORT_SIGN not in ROLE_CAPABILITIES[Role.VIEWER]
+
+# WP17 — research/clinical barrier (structural):
+# The researcher role holds zero clinical capabilities — cohort work is
+# firewalled from the clinical reading path.  ``cohort:*`` grants no access to
+# the write-restricted ``deid_links`` collection (only ``patient:erase`` may).
+assert ROLE_CAPABILITIES[Role.RESEARCHER] & CLINICAL_CAPABILITIES == frozenset(), (
+    "researcher must have zero clinical capabilities — the barrier is structural"
+)
+assert Capability.PATIENT_ERASE not in ROLE_CAPABILITIES[Role.RESEARCHER], (
+    "researcher must not hold patient:erase — cohort:* grants no deid_links access"
+)
 
 
 def get_role_capabilities(role: Role) -> frozenset[Capability]:

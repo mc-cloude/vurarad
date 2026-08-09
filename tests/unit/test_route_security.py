@@ -237,3 +237,63 @@ def test_studies_routes_have_phi_capability_check() -> None:
         assert "_require" in names or "require_patient_identity_access" in names, (
             f"Route {method} {path} missing PHI capability check"
         )
+
+
+# ---------------------------------------------------------------------------
+# /api/v1/cohorts/* route security (WP17 — criterion 8)
+# ---------------------------------------------------------------------------
+def _cohort_routes(app: FastAPI) -> list[tuple[str, str, APIRoute]]:
+    """Filter to /api/v1/cohorts routes only."""
+    return [
+        (m, p, r)
+        for m, p, r in _collect_api_routes(app)
+        if p.startswith("/api/v1/cohorts")
+    ]
+
+
+_COHORT_CAPABILITIES: dict[tuple[str, str], str] = {
+    ("POST", "/api/v1/cohorts"): "cohort:create",
+    ("GET", "/api/v1/cohorts"): "cohort:read",
+    ("GET", "/api/v1/cohorts/{cohort_id}"): "cohort:read",
+    ("POST", "/api/v1/cohorts/{cohort_id}/subjects"): "cohort:subject:add",
+    ("POST", "/api/v1/cohorts/{cohort_id}/segmentation"): "cohort:segmentation",
+}
+
+
+def test_cohort_route_count_is_five() -> None:
+    """The cohorts package exposes exactly five routes (§3.22 routes 60-63)."""
+    app = create_app()
+    routes = _cohort_routes(app)
+    assert len(routes) == 5, f"Expected 5 cohort routes, got {len(routes)}"
+
+
+def test_cohort_routes_require_auth_and_mfa() -> None:
+    """Every /api/v1/cohorts/* route carries get_current_user and require_mfa."""
+    app = create_app()
+    for method, path, route in _cohort_routes(app):
+        names = _dep_names(route)
+        assert "get_current_user" in names, f"Route {method} {path} missing get_current_user"
+        assert "require_mfa" in names, f"Route {method} {path} missing require_mfa"
+
+
+def test_cohort_routes_declare_cohort_capability() -> None:
+    """Every cohort route declares exactly one ``cohort:*`` capability (criterion 8)."""
+    from app.core.capabilities import Capability
+
+    app = create_app()
+    for method, path, route in _cohort_routes(app):
+        caps = _require_capability_calls(route)
+        assert len(caps) == 1, (
+            f"Route {method} {path} declares {len(caps)} capabilities, expected 1"
+        )
+        cap = _extract_capability(caps[0])
+        assert cap is not None, f"Route {method} {path} capability closure empty"
+        expected = _COHORT_CAPABILITIES.get((method, path))
+        assert expected is not None, f"Route {method} {path} not in expected inventory"
+        assert cap == Capability(expected), (
+            f"Route {method} {path} has capability {cap}, expected {expected}"
+        )
+        # Every cohort route capability must be a cohort:* capability.
+        assert cap.value.startswith("cohort:"), (
+            f"Route {method} {path} capability {cap} is not a cohort:* capability"
+        )

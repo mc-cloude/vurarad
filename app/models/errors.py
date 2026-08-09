@@ -44,6 +44,11 @@ class ErrorCode(StrEnum):
     # -- de-identification ---------------------------------------------------
     DEID_PIXEL_PASS_FAILED = "DEID_PIXEL_PASS_FAILED"
     DEID_CONFIDENCE_LOW = "DEID_CONFIDENCE_LOW"
+    DEID_REVIEW_PENDING = "DEID_REVIEW_PENDING"
+
+    # -- research / clinical barrier (WP17) ----------------------------------
+    RESEARCH_OUTPUT_NOT_PERMITTED = "RESEARCH_OUTPUT_NOT_PERMITTED"
+    DEID_LINK_ACCESS_DENIED = "DEID_LINK_ACCESS_DENIED"
 
     # -- metering ------------------------------------------------------------
     SPEND_WARNING = "SPEND_WARNING"

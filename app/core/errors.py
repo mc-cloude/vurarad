@@ -137,6 +137,38 @@ class AuditStoreNotImmutableError(ApiError):
     message = "Audit store does not enforce bucket lock (WORM)"
 
 
+# -- research / clinical barrier (WP17) -------------------------------------
+class ResearchOutputNotPermittedError(ConflictError):
+    """A research-derived identifier was offered to the clinical report path.
+
+    Raised by ``ReportService.attach()`` and ``set_section()`` when any
+    identifier bears a ``RESEARCH_ID_PREFIX`` (e.g. a cohort pseudonym
+    ``cs_…``).  The barrier is one-way: research output can never reach a
+    signed clinical report (acceptance criterion 1).
+    """
+
+    code = ErrorCode.RESEARCH_OUTPUT_NOT_PERMITTED
+    status_code = 409
+    message = "Research output is not permitted in the clinical report path"
+
+
+class DeidReviewPendingError(ConflictError):
+    """A subject with open de-ID review items cannot be activated or measured.
+
+    Raised by ``CohortSubjectService.activate_subject()`` and
+    ``extract_features()`` while a subject has any open review item
+    (acceptance criterion 3).
+    """
+
+    code = ErrorCode.DEID_REVIEW_PENDING
+    status_code = 409
+    message = "De-identification review is pending for this subject"
+
+    def __init__(self, open_item_count: int, message: str | None = None) -> None:
+        self.open_item_count = open_item_count
+        super().__init__(message or f"{open_item_count} de-ID review item(s) pending")
+
+
 # -- envelope ----------------------------------------------------------------
 def _make_error_body(
     code: ErrorCode,
