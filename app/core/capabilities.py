@@ -17,6 +17,7 @@ class Capability(StrEnum):
     STUDY_IMPORT = "study:import"
     STUDY_DELETE = "study:delete"
     STUDY_SEARCH = "study:search"
+    STUDY_ANNOTATE = "study:annotate"
 
     REPORT_READ = "report:read"
     REPORT_WRITE = "report:write"
@@ -49,6 +50,7 @@ PHI_CAPABILITIES: frozenset[Capability] = frozenset(
         Capability.STUDY_WRITE,
         Capability.STUDY_IMPORT,
         Capability.STUDY_SEARCH,
+        Capability.STUDY_ANNOTATE,
         Capability.REPORT_READ,
         Capability.REPORT_WRITE,
         Capability.REPORT_SIGN,
@@ -99,6 +101,7 @@ ROLE_CAPABILITIES: dict[Role, frozenset[Capability]] = {
             Capability.STUDY_WRITE,
             Capability.STUDY_IMPORT,
             Capability.STUDY_SEARCH,
+            Capability.STUDY_ANNOTATE,
             Capability.REPORT_READ,
             Capability.REPORT_WRITE,
             Capability.REPORT_SIGN,

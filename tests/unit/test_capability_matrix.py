@@ -59,6 +59,7 @@ def test_radiologist_capabilities() -> None:
             Capability.STUDY_WRITE,
             Capability.STUDY_IMPORT,
             Capability.STUDY_SEARCH,
+            Capability.STUDY_ANNOTATE,
             Capability.REPORT_READ,
             Capability.REPORT_WRITE,
             Capability.REPORT_SIGN,

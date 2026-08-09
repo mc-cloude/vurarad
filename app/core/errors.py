@@ -102,6 +102,35 @@ class IngestInProgressError(ConflictError):
     message = "An ingest job is already in progress for this study"
 
 
+class FindingsPendingError(ConflictError):
+    """A study cannot move to report drafting while any finding is PENDING.
+
+    Raised by ``FindingService.assert_draftable()`` (criterion 9).  Carries the
+    pending count so the 409 response can report it.
+    """
+
+    code = ErrorCode.FINDINGS_PENDING
+    status_code = 409
+    message = "Findings are still pending disposition"
+
+    def __init__(self, pending_count: int, message: str | None = None) -> None:
+        self.pending_count = pending_count
+        super().__init__(message or f"{pending_count} finding(s) pending disposition")
+
+
+class ResidencyViolationError(ApiError):
+    """Pixels were processed outside the tenant's residency zone (§5.11).
+
+    Raised by ``SegmentationDispatcher.dispatch()`` when the segmentation region
+    is not in the tenant's residency zone — e.g. an ``africa`` tenant cannot
+    offload to ``europe-west1`` (acceptance criterion 5).
+    """
+
+    code = ErrorCode.RESIDENCY_VIOLATION
+    status_code = 403
+    message = "Residency violation: data processed outside the tenant's zone"
+
+
 class AuditStoreNotImmutableError(ApiError):
     code = ErrorCode.AUDIT_STORE_NOT_IMMUTABLE
     status_code = 503

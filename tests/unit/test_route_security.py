@@ -194,8 +194,12 @@ def test_no_route_path_contains_direct_identifier_param() -> None:
 # /api/v1/studies/* route security (WP4 — §3.3–3.6 acceptance criteria 11–15)
 # ---------------------------------------------------------------------------
 def _studies_routes(app: FastAPI) -> list[tuple[str, str, APIRoute]]:
-    """Filter to /api/v1/studies routes only."""
-    return [(m, p, r) for m, p, r in _collect_api_routes(app) if p.startswith("/api/v1/studies")]
+    """Filter to /api/v1/studies routes only (excluding WP12 sub-resources)."""
+    return [
+        (m, p, r)
+        for m, p, r in _collect_api_routes(app)
+        if p.startswith("/api/v1/studies") and "/findings" not in p and "/preprocessing" not in p
+    ]
 
 
 def test_studies_route_count_is_six() -> None:
