@@ -195,9 +195,7 @@ async def test_none_token_counts() -> None:
     budget = FakeBudgetRepo()
     service = _make_service(models, budget)
 
-    await _collect(
-        service.generate_stream(request_id="r", contents="c", tenant_id="t")
-    )
+    await _collect(service.generate_stream(request_id="r", contents="c", tenant_id="t"))
 
     _tenant, usage = budget.recorded[0]
     for field in (

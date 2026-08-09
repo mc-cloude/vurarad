@@ -48,9 +48,7 @@ class _RecordingModels:
             yield types.GenerateContentResponse(
                 candidates=[
                     types.Candidate(
-                        content=types.Content(
-                            parts=[types.Part(text="<<SECTION:Findings>>ok")]
-                        ),
+                        content=types.Content(parts=[types.Part(text="<<SECTION:Findings>>ok")]),
                         finish_reason=types.FinishReason.STOP,
                     )
                 ],

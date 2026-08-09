@@ -51,8 +51,7 @@ def test_streaming_path_never_reads_chunk_parsed() -> None:
     source = (REPO_ROOT / "app" / "services" / "gemini_service.py").read_text()
     tree = ast.parse(source)
     parsed_accesses = [
-        node for node in ast.walk(tree)
-        if isinstance(node, ast.Attribute) and node.attr == "parsed"
+        node for node in ast.walk(tree) if isinstance(node, ast.Attribute) and node.attr == "parsed"
     ]
     assert parsed_accesses == [], (
         "gemini_service.py must never access .parsed on the streaming path; "

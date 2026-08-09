@@ -38,8 +38,13 @@ from tests.conftest import VALID_TOKEN, FakeTokenVerifier, StubAuditStore, make_
 # ---------------------------------------------------------------------------
 class _Usage:
     def __init__(
-        self, *, prompt: int | None = 100, candidates: int | None = 50,
-        thoughts: int | None = 10, cached: int | None = 5, total: int | None = 165,
+        self,
+        *,
+        prompt: int | None = 100,
+        candidates: int | None = 50,
+        thoughts: int | None = 10,
+        cached: int | None = 5,
+        total: int | None = 165,
     ) -> None:
         self.prompt_token_count = prompt
         self.candidates_token_count = candidates
@@ -55,7 +60,10 @@ class _Candidate:
 
 class _Chunk:
     def __init__(
-        self, text: str | None, *, usage: _Usage | None = None,
+        self,
+        text: str | None,
+        *,
+        usage: _Usage | None = None,
         finish_reason: types.FinishReason | None = None,
         model_version: str = "gemini-2.5-flash-001",
     ) -> None:
@@ -72,7 +80,11 @@ class _AsyncModels:
         self.calls = 0
 
     async def generate_content_stream(
-        self, *, model: str, contents: str, config: Any = None,
+        self,
+        *,
+        model: str,
+        contents: str,
+        config: Any = None,
     ) -> AsyncIterator[_Chunk]:
         self.calls += 1
         chunks, raise_exc = self._chunks, self._raise

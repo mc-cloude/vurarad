@@ -253,9 +253,9 @@ class GeminiService:
                     for section, fragment in parser.feed(text):
                         yield _sse(
                             "delta",
-                            AiStreamDelta(
-                                section=section, fragment=fragment
-                            ).model_dump(by_alias=True),
+                            AiStreamDelta(section=section, fragment=fragment).model_dump(
+                                by_alias=True
+                            ),
                         )
 
             # Flush any body held back as a potential partial marker.
