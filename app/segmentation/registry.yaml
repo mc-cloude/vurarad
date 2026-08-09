@@ -1,0 +1,68 @@
+# Segmentation model registry (§3.21.4).
+#
+# Maps (modality, bodyPart, specialisation) → bundle.  A pair absent from this
+# file resolves to NO_MODEL_AVAILABLE — the default is honest.  Specialisation
+# "*" is the wildcard: it matches any (or unspecified) specialisation.
+#
+# state is the *registry* state (before runtime policy).  The dispatcher applies
+# runtime policy on top of it to produce the *effective* state:
+#   AVAILABLE              → may be UNAVAILABLE_IN_REGION on a cpu_fast deployment
+#   NO_MODEL_AVAILABLE     → terminal — no bundle exists
+#   DISABLED_BY_LICENCE    → terminal — licence gate closed
+#
+# requiresGpu: true means the bundle only runs on a GPU runtime.  On cpu_fast it
+# becomes UNAVAILABLE_IN_REGION.
+
+entries:
+  - modality: CT
+    bodyPart: CHEST
+    specialisation: "*"
+    bundleId: totalsegmentator-2.4.0
+    state: AVAILABLE
+    regulatoryClass: RUO
+    requiresGpu: false
+    expectedSeconds: 60
+    categories:
+      - ANATOMICAL_MEASUREMENT
+
+  - modality: CT
+    bodyPart: ABDOMEN
+    specialisation: "*"
+    bundleId: totalsegmentator-2.4.0
+    state: AVAILABLE
+    regulatoryClass: RUO
+    requiresGpu: false
+    expectedSeconds: 60
+    categories:
+      - ANATOMICAL_MEASUREMENT
+
+  - modality: MR
+    bodyPart: BRAIN
+    specialisation: "*"
+    bundleId: monai-brats-mri-0.4.6
+    state: AVAILABLE
+    regulatoryClass: RUO
+    requiresGpu: true
+    expectedSeconds: 95
+    categories:
+      - ANATOMICAL_MEASUREMENT
+
+  - modality: CR
+    bodyPart: CHEST
+    specialisation: "*"
+    bundleId: null
+    state: NO_MODEL_AVAILABLE
+    regulatoryClass: RUO
+    requiresGpu: false
+    expectedSeconds: 0
+    detail: "No segmentation bundle. Viewer, reporting and dictation drafting only."
+
+  - modality: US
+    bodyPart: "*"
+    specialisation: "*"
+    bundleId: null
+    state: NO_MODEL_AVAILABLE
+    regulatoryClass: RUO
+    requiresGpu: false
+    expectedSeconds: 0
+    detail: "No ultrasound segmentation bundle exists. Heaviest burned-in-PHI burden; de-identification applies in full."
