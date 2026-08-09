@@ -217,9 +217,7 @@ class TestMetadataStoreContract:
         await store.update(collection, "d1", {"c": 3})
         assert await store.get(collection, "d1") == {"a": 1, "b": 2, "c": 3}
 
-    async def test_update_deep_merges_nested_maps(
-        self, store: Any, collection: str
-    ) -> None:
+    async def test_update_deep_merges_nested_maps(self, store: Any, collection: str) -> None:
         """Nested maps merge recursively — matching Firestore ``set(merge=True)``."""
         await store.set(collection, "d1", {"m": {"x": 1, "y": 2}, "s": "old"})
         await store.update(collection, "d1", {"m": {"y": 20, "z": 30}, "t": True})
@@ -229,9 +227,7 @@ class TestMetadataStoreContract:
             "t": True,
         }
 
-    async def test_update_replaces_scalars_and_arrays(
-        self, store: Any, collection: str
-    ) -> None:
+    async def test_update_replaces_scalars_and_arrays(self, store: Any, collection: str) -> None:
         """Scalars and arrays are replaced, not merged (Firestore semantics)."""
         await store.set(collection, "d1", {"n": 1, "tags": ["a", "b"]})
         await store.update(collection, "d1", {"n": 99, "tags": ["c"]})

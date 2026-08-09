@@ -205,9 +205,7 @@ def decode_and_verify_jwt(
             f"invalid issuer: expected {issuer!r}, got {claims.get('iss')!r}"
         )
     token_aud = claims.get("aud")
-    aud_ok = token_aud == audience or (
-        isinstance(token_aud, list) and audience in token_aud
-    )
+    aud_ok = token_aud == audience or (isinstance(token_aud, list) and audience in token_aud)
     if not aud_ok:
         raise OIDCVerificationError("invalid audience")
     exp = claims.get("exp")
@@ -312,6 +310,4 @@ class LocalOidcVerifier:
             jwks=self._jwks,
             hmac_secret=self._hmac_secret,
         )
-        return claims_to_authenticated_user(
-            claims, mfa_window_seconds=self._mfa_window_seconds
-        )
+        return claims_to_authenticated_user(claims, mfa_window_seconds=self._mfa_window_seconds)

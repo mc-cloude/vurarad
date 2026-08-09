@@ -225,8 +225,7 @@ class Settings(BaseSettings):
                 raise ValueError("oidc_audience is required when hosting='onprem'")
             if not self.oidc_jwks_path and not self.oidc_hmac_secret:
                 raise ValueError(
-                    "oidc_jwks_path or oidc_hmac_secret is required"
-                    " when hosting='onprem'"
+                    "oidc_jwks_path or oidc_hmac_secret is required when hosting='onprem'"
                 )
 
         # MinIO backend validation

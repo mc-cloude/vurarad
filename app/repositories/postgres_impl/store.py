@@ -112,9 +112,7 @@ class PostgresMetadataStore:
         """Build a store from application settings (``settings.postgres_dsn``)."""
         dsn = getattr(settings, "postgres_dsn", None)
         if not dsn:
-            raise ValueError(
-                "postgres_dsn is required for the PostgreSQL metadata backend"
-            )
+            raise ValueError("postgres_dsn is required for the PostgreSQL metadata backend")
         return cls(dsn=dsn)
 
     @classmethod

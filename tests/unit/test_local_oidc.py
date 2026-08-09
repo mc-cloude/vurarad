@@ -135,9 +135,7 @@ class ReferenceIdentityPlatformVerifier:
             jwks=self._jwks,
             hmac_secret=self._hmac_secret,
         )
-        return claims_to_authenticated_user(
-            claims, mfa_window_seconds=self._mfa_window_seconds
-        )
+        return claims_to_authenticated_user(claims, mfa_window_seconds=self._mfa_window_seconds)
 
 
 @pytest.fixture(params=["local", "idp"])
@@ -230,12 +228,8 @@ async def test_audience_as_list_is_accepted(verifier: Any) -> None:
 async def test_mfa_window_is_configurable() -> None:
     """A 60s window expires an assertion that a 300s window accepts."""
     token = mint_jwt(base_claims(amr=["mfa"], mfa_time=time.time() - 100))
-    strict = LocalOidcVerifier(
-        issuer=ISSUER, audience=AUDIENCE, jwks=JWKS, mfa_window_seconds=60
-    )
-    loose = LocalOidcVerifier(
-        issuer=ISSUER, audience=AUDIENCE, jwks=JWKS, mfa_window_seconds=300
-    )
+    strict = LocalOidcVerifier(issuer=ISSUER, audience=AUDIENCE, jwks=JWKS, mfa_window_seconds=60)
+    loose = LocalOidcVerifier(issuer=ISSUER, audience=AUDIENCE, jwks=JWKS, mfa_window_seconds=300)
     assert (await strict.verify(token)).mfa_state == SecondFactorState.EXPIRED
     assert (await loose.verify(token)).mfa_state == SecondFactorState.VERIFIED
 
@@ -244,13 +238,8 @@ async def test_mfa_window_is_configurable() -> None:
 # Direct contract-function checks
 # ---------------------------------------------------------------------------
 def test_claims_to_second_factor_state_direct() -> None:
-    assert (
-        claims_to_second_factor_state({"amr": ["mfa"]}, now=_NOW)
-        == SecondFactorState.VERIFIED
-    )
-    assert (
-        claims_to_second_factor_state({}, now=_NOW) == SecondFactorState.UNENROLLED
-    )
+    assert claims_to_second_factor_state({"amr": ["mfa"]}, now=_NOW) == SecondFactorState.VERIFIED
+    assert claims_to_second_factor_state({}, now=_NOW) == SecondFactorState.UNENROLLED
     assert (
         claims_to_second_factor_state({"mfa_enrolled": True}, now=_NOW)
         == SecondFactorState.ENROLLED
