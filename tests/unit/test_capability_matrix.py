@@ -66,12 +66,39 @@ def test_radiologist_capabilities() -> None:
             Capability.REPORT_ADDENDUM,
             Capability.IMAGING_ACCESS,
             Capability.AI_DRAFT,
+            Capability.EVIDENCE_READ,
+            Capability.EVIDENCE_ACCEPT,
             Capability.BREAK_GLASS,
             Capability.RESEARCH_COHORT_CREATE,
             Capability.RESEARCH_FEATURES_READ,
             Capability.RESEARCH_EXPORT,
         }
     )
+
+
+# ---------------------------------------------------------------------------
+# Evidence capabilities (WP13) — radiologist-only PHI capabilities
+# ---------------------------------------------------------------------------
+def test_evidence_capabilities_exist() -> None:
+    assert Capability.EVIDENCE_READ.value == "evidence:read"
+    assert Capability.EVIDENCE_ACCEPT.value == "evidence:accept"
+
+
+def test_evidence_capabilities_are_phi() -> None:
+    assert is_phi_capability(Capability.EVIDENCE_READ)
+    assert is_phi_capability(Capability.EVIDENCE_ACCEPT)
+
+
+def test_radiologist_has_evidence_capabilities() -> None:
+    assert has_capability(Role.RADIOLOGIST, Capability.EVIDENCE_READ)
+    assert has_capability(Role.RADIOLOGIST, Capability.EVIDENCE_ACCEPT)
+
+
+def test_viewer_and_admin_lack_evidence_capabilities() -> None:
+    assert not has_capability(Role.VIEWER, Capability.EVIDENCE_READ)
+    assert not has_capability(Role.VIEWER, Capability.EVIDENCE_ACCEPT)
+    assert not has_capability(Role.ADMIN, Capability.EVIDENCE_READ)
+    assert not has_capability(Role.ADMIN, Capability.EVIDENCE_ACCEPT)
 
 
 # ---------------------------------------------------------------------------

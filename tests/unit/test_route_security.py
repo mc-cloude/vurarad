@@ -237,3 +237,61 @@ def test_studies_routes_have_phi_capability_check() -> None:
         assert "_require" in names or "require_patient_identity_access" in names, (
             f"Route {method} {path} missing PHI capability check"
         )
+
+
+# ---------------------------------------------------------------------------
+# /api/v1/evidence/* route security (WP13 — §3.16)
+# ---------------------------------------------------------------------------
+def _evidence_routes(app: FastAPI) -> list[tuple[str, str, APIRoute]]:
+    """Filter to /api/v1/evidence routes only."""
+    return [
+        (m, p, r) for m, p, r in _collect_api_routes(app) if p.startswith("/api/v1/evidence")
+    ]
+
+
+_EVIDENCE_CAPABILITIES: dict[tuple[str, str], str] = {
+    ("POST", "/api/v1/evidence/lookup"): "evidence:read",
+    ("POST", "/api/v1/evidence/accept"): "evidence:accept",
+}
+
+
+def test_evidence_route_count_is_two() -> None:
+    """The evidence package exposes exactly two routes (lookup + accept)."""
+    app = create_app()
+    routes = _evidence_routes(app)
+    assert len(routes) == 2, f"Expected 2 evidence routes, got {len(routes)}"
+
+
+def test_evidence_routes_require_auth_and_mfa() -> None:
+    """Every /api/v1/evidence/* route must carry get_current_user and require_mfa."""
+    app = create_app()
+    for method, path, route in _evidence_routes(app):
+        names = _dep_names(route)
+        assert "get_current_user" in names, f"Route {method} {path} missing get_current_user"
+        assert "require_mfa" in names, f"Route {method} {path} missing require_mfa"
+
+
+def test_evidence_routes_declare_exactly_one_phi_capability() -> None:
+    """Every /api/v1/evidence/* route declares exactly one PHI capability."""
+    from app.core.capabilities import Capability
+
+    app = create_app()
+    for method, path, route in _evidence_routes(app):
+        caps = _require_capability_calls(route)
+        assert len(caps) == 1, (
+            f"Route {method} {path} declares {len(caps)} capabilities, expected 1"
+        )
+        cap = _extract_capability(caps[0])
+        assert cap is not None, f"Route {method} {path} capability closure has no value"
+        expected = _EVIDENCE_CAPABILITIES[(method, path)]
+        assert cap == Capability(expected), (
+            f"Route {method} {path} has capability {cap}, expected {expected}"
+        )
+
+
+def test_no_evidence_route_in_public_routes() -> None:
+    """No /api/v1/evidence path may appear in PUBLIC_ROUTES."""
+    for _method, path in PUBLIC_ROUTES:
+        assert not path.startswith("/api/v1/evidence"), (
+            f"evidence route {path} must not be in PUBLIC_ROUTES"
+        )

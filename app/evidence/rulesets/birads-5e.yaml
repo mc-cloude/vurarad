@@ -1,0 +1,58 @@
+# BI-RADS 5th edition — breast assessment category to management mapping.
+# Statements are short summaries (≤ 300 chars), never reproduced article text.
+# The logic references the attribute fields of BreastAssessmentAttributes.
+id: birads-5e
+name: "BI-RADS 5th Edition — Breast Assessment to Management"
+version: "5e.1"
+findingType: breast_assessment
+reviewedBy: "VuraRAD Evidence Review Board"
+reviewedAt: "2024-01-15"
+citation:
+  doi: null
+  url: "https://www.acr.org/Clinical-Resources/Reporting-and-Data-Systems/Breast-Imaging-Reporting-and-Data-System"
+  title: "ACR BI-RADS Atlas 5th Edition — Breast Imaging Reporting and Data System"
+rules:
+  - id: birads-0-incomplete
+    statement: "BI-RADS 0: incomplete assessment; additional imaging needed."
+    logic: "category == \"0\""
+    recommendation: "Recall for additional imaging."
+
+  - id: birads-1-negative
+    statement: "BI-RADS 1: negative assessment; routine screening."
+    logic: "category == \"1\""
+    recommendation: "Routine screening."
+
+  - id: birads-2-benign
+    statement: "BI-RADS 2: benign finding; routine screening."
+    logic: "category == \"2\""
+    recommendation: "Routine screening."
+
+  - id: birads-3-favored-benign
+    statement: "BI-RADS 3: favored benign finding; short-interval follow-up at 6 months."
+    logic: "category == \"3\""
+    recommendation: "Short-interval follow-up at 6 months."
+
+  - id: birads-4a-low-concern
+    statement: "BI-RADS 4A: low-concern finding; biopsy warranted."
+    logic: "category == \"4A\""
+    recommendation: "Biopsy; low concern for carcinoma."
+
+  - id: birads-4b-moderate-concern
+    statement: "BI-RADS 4B: moderate-concern finding; biopsy warranted."
+    logic: "category == \"4B\""
+    recommendation: "Biopsy; moderate concern for carcinoma."
+
+  - id: birads-4c-high-concern
+    statement: "BI-RADS 4C: high-concern finding; biopsy warranted."
+    logic: "category == \"4C\""
+    recommendation: "Biopsy; high concern for carcinoma."
+
+  - id: birads-5-suggestive-carcinoma
+    statement: "BI-RADS 5: highly suggestive of carcinoma; biopsy and treatment planning."
+    logic: "category == \"5\""
+    recommendation: "Biopsy and treatment planning; highly suggestive of carcinoma."
+
+  - id: birads-6-known-carcinoma
+    statement: "BI-RADS 6: biopsy-proven carcinoma; surgical and treatment planning."
+    logic: "category == \"6\""
+    recommendation: "Surgical and treatment planning; known carcinoma."

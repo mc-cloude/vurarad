@@ -1,0 +1,53 @@
+# LI-RADS 2018 — CT/MRI liver observation categories and management.
+# Statements are short summaries (≤ 300 chars), never reproduced article text.
+# The logic references the attribute fields of LiverObservationAttributes.
+id: lirads-2018
+name: "LI-RADS 2018 — Liver Observation Categories"
+version: "2018.1"
+findingType: liver_observation
+reviewedBy: "VuraRAD Evidence Review Board"
+reviewedAt: "2024-01-15"
+citation:
+  doi: null
+  url: "https://www.acr.org/Clinical-Resources/Reporting-and-Data-Systems/LI-RADS"
+  title: "ACR LI-RADS CT/MRI 2018 — Liver Imaging Reporting and Data System"
+rules:
+  - id: lr-1-definitely-benign
+    statement: "LR-1: definitely benign observation; no further action required."
+    logic: "category == \"LR-1\""
+    recommendation: "No action; routine surveillance per protocol."
+
+  - id: lr-2-favored-benign
+    statement: "LR-2: favored benign observation; no further action required."
+    logic: "category == \"LR-2\""
+    recommendation: "No action; routine surveillance per protocol."
+
+  - id: lr-3-indeterminate
+    statement: "LR-3: indeterminate observation; short-interval follow-up or review."
+    logic: "category == \"LR-3\""
+    recommendation: "Short-interval follow-up or multidisciplinary review."
+
+  - id: lr-4-favored-hcc
+    statement: "LR-4: favored HCC observation; multidisciplinary review advised."
+    logic: "category == \"LR-4\""
+    recommendation: "Multidisciplinary review; consider treatment or short follow-up."
+
+  - id: lr-5-definite-hcc
+    statement: "LR-5: definite HCC; treatment referral along the HCC pathway."
+    logic: "category == \"LR-5\""
+    recommendation: "Treatment referral along the HCC pathway."
+
+  - id: lr-m-neoplasm-not-hcc
+    statement: "LR-M: neoplasm not specific for HCC; biopsy or alternate management."
+    logic: "category == \"LR-M\""
+    recommendation: "Biopsy or alternate management; not specific for HCC."
+
+  - id: lr-nc-not-categorizable
+    statement: "LR-NC: not categorizable due to image quality or technique limitation."
+    logic: "category == \"LR-NC\""
+    recommendation: "Additional imaging or review needed."
+
+  - id: lr-tiv-tumor-in-vein
+    statement: "LR-TIV: tumor in vein identified; urgent management required."
+    logic: "category == \"LR-TIV\""
+    recommendation: "Urgent management; tumor in vein identified."

@@ -25,6 +25,11 @@ logger = logging.getLogger("vurarad")
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Startup / shutdown — validate connectivity, initialise services."""
     logger.info("vuraRAD API starting", extra={"environment": settings.environment.value})
+    # Load and validate evidence rule sets at startup so a malformed or
+    # unreviewed rule set aborts boot rather than shipping broken evidence.
+    from app.evidence.loader import default_registry
+
+    app.state.evidence_registry = default_registry()
     yield
     logger.info("vuraRAD API shutting down")
 
@@ -70,6 +75,7 @@ def create_app() -> FastAPI:
     # -- routers -------------------------------------------------------------
     from app.api.v1.routers.auth import router as auth_router
     from app.api.v1.routers.dictation import router as dictation_router
+    from app.api.v1.routers.evidence import router as evidence_router
     from app.api.v1.routers.findings import router as findings_router
     from app.api.v1.routers.health import router as health_router
     from app.api.v1.routers.ingest import router as ingest_router
@@ -86,6 +92,7 @@ def create_app() -> FastAPI:
     app.include_router(findings_router, prefix="/api/v1")
     app.include_router(dictation_router, prefix="/api/v1")
     app.include_router(preprocessing_router, prefix="/api/v1")
+    app.include_router(evidence_router, prefix="/api/v1")
     app.include_router(dicomweb_router)
 
     return app

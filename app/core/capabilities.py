@@ -29,6 +29,10 @@ class Capability(StrEnum):
     AI_DRAFT = "ai:draft"
     AI_FULL = "ai:full"
 
+    # -- evidence (WP13) -----------------------------------------------------
+    EVIDENCE_READ = "evidence:read"
+    EVIDENCE_ACCEPT = "evidence:accept"
+
     # -- administration ------------------------------------------------------
     AUDIT_READ = "audit:read"
     AUDIT_EXPORT = "audit:export"
@@ -58,6 +62,8 @@ PHI_CAPABILITIES: frozenset[Capability] = frozenset(
         Capability.IMAGING_ACCESS,
         Capability.AI_DRAFT,
         Capability.AI_FULL,
+        Capability.EVIDENCE_READ,
+        Capability.EVIDENCE_ACCEPT,
         Capability.COMPLIANCE_PURGE,
         Capability.BREAK_GLASS,
         Capability.RESEARCH_COHORT_CREATE,
@@ -108,6 +114,8 @@ ROLE_CAPABILITIES: dict[Role, frozenset[Capability]] = {
             Capability.REPORT_ADDENDUM,
             Capability.IMAGING_ACCESS,
             Capability.AI_DRAFT,
+            Capability.EVIDENCE_READ,
+            Capability.EVIDENCE_ACCEPT,
             Capability.BREAK_GLASS,
             Capability.RESEARCH_COHORT_CREATE,
             Capability.RESEARCH_FEATURES_READ,

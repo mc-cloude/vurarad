@@ -118,6 +118,24 @@ class FindingsPendingError(ConflictError):
         super().__init__(message or f"{pending_count} finding(s) pending disposition")
 
 
+class FindingNotConfirmedError(ConflictError):
+    """Evidence may only be looked up for a CONFIRMED or EDITED finding (WP13).
+
+    Raised by ``EvidenceService.lookup()`` / ``accept()`` when the finding's
+    disposition state is ``PENDING`` or ``REJECTED`` — evidence is a
+    confirmation-gated aid, never a substitute for the radiologist's disposition
+    (criterion 1).
+    """
+
+    code = ErrorCode.FINDING_NOT_CONFIRMED
+    status_code = 409
+    message = "Finding must be confirmed before evidence can be looked up"
+
+    def __init__(self, state: str, message: str | None = None) -> None:
+        self.state = state
+        super().__init__(message or f"Finding disposition state '{state}' is not confirmed")
+
+
 class ResidencyViolationError(ApiError):
     """Pixels were processed outside the tenant's residency zone (§5.11).
 
