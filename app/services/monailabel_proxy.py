@@ -270,9 +270,7 @@ class MonaiLabelProxyService:
                 max_response_bytes=self._max_response_bytes,
             )
         except ResponseTooLargeError as exc:
-            raise PayloadTooLargeError(
-                "Response body exceeds the maximum allowed size"
-            ) from exc
+            raise PayloadTooLargeError("Response body exceeds the maximum allowed size") from exc
         except httpx.TimeoutException as exc:
             raise UpstreamTimeoutError("MONAI Label backend timed out") from exc
         except httpx.HTTPError as exc:

@@ -431,18 +431,14 @@ def test_proxy_returns_502_on_upstream_unavailable(
 # --------------------------------------------------------------------------- #
 # GET /licence — feature flag surface (criterion 4)
 # --------------------------------------------------------------------------- #
-def test_get_licence_exposes_slicer_addon_enabled(
-    proxy_app: FastAPI, client: TestClient
-) -> None:
+def test_get_licence_exposes_slicer_addon_enabled(proxy_app: FastAPI, client: TestClient) -> None:
     proxy_app.state.licence_service = LicenceService({"slicer_addon": True})
     r = client.get("/api/v1/licence", headers=_auth())
     assert r.status_code == 200
     assert r.json()["features"]["slicer_addon"] is True
 
 
-def test_get_licence_exposes_slicer_addon_disabled(
-    proxy_app: FastAPI, client: TestClient
-) -> None:
+def test_get_licence_exposes_slicer_addon_disabled(proxy_app: FastAPI, client: TestClient) -> None:
     proxy_app.state.licence_service = LicenceService({"slicer_addon": False})
     r = client.get("/api/v1/licence", headers=_auth())
     assert r.status_code == 200

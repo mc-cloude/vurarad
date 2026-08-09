@@ -167,9 +167,7 @@ async def proxy_monailabel(
         )
     body = await _read_bounded_body(
         request,
-        int(
-            getattr(request.app.state, "monailabel_max_request_bytes", DEFAULT_MAX_REQUEST_BYTES)
-        ),
+        int(getattr(request.app.state, "monailabel_max_request_bytes", DEFAULT_MAX_REQUEST_BYTES)),
     )
     resp = await proxy_service.proxy(
         user,

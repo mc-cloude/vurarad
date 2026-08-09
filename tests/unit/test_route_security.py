@@ -245,9 +245,7 @@ def test_studies_routes_have_phi_capability_check() -> None:
 def _monailabel_routes(app: FastAPI) -> list[tuple[str, str, APIRoute]]:
     """Filter to the desktop add-on proxy route only."""
     return [
-        (m, p, r)
-        for m, p, r in _collect_api_routes(app)
-        if p.startswith("/api/v1/monailabel/")
+        (m, p, r) for m, p, r in _collect_api_routes(app) if p.startswith("/api/v1/monailabel/")
     ]
 
 
@@ -305,6 +303,4 @@ def test_licence_route_requires_authentication_only() -> None:
         names = _dep_names(route)
         assert "get_current_user" in names, f"Route {method} {path} missing get_current_user"
         assert "require_mfa" not in names, f"Route {method} {path} must not require MFA"
-        assert "_require" not in names, (
-            f"Route {method} {path} must not require a PHI capability"
-        )
+        assert "_require" not in names, f"Route {method} {path} must not require a PHI capability"
