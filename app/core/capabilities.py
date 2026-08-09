@@ -28,6 +28,13 @@ class Capability(StrEnum):
     AI_DRAFT = "ai:draft"
     AI_FULL = "ai:full"
 
+    # -- de-identification ---------------------------------------------------
+    # deid:review is a PHI-sensitive capability: a reviewer reads potentially
+    # PHI-bearing regions to confirm or restore redactions.  It is held by no
+    # default role (granted out-of-band to designated reviewers), so admin never
+    # holds it — separation of duties (criterion 8).
+    DEID_REVIEW = "deid:review"
+
     # -- administration ------------------------------------------------------
     AUDIT_READ = "audit:read"
     AUDIT_EXPORT = "audit:export"
@@ -56,6 +63,7 @@ PHI_CAPABILITIES: frozenset[Capability] = frozenset(
         Capability.IMAGING_ACCESS,
         Capability.AI_DRAFT,
         Capability.AI_FULL,
+        Capability.DEID_REVIEW,
         Capability.COMPLIANCE_PURGE,
         Capability.BREAK_GLASS,
         Capability.RESEARCH_COHORT_CREATE,

@@ -125,6 +125,20 @@ class Settings(BaseSettings):
     deid_recall_floor_us_sc_ot_xc: float = 0.99
     deid_recall_floor_cr_dx_mg: float = 0.98
     deid_recall_floor_ct_mr: float = 0.97
+    deid_confidence_threshold: float = 0.9
+    # Engine selection.  Defaults are dependency-free so the app runs in
+    # dev/CI without paddleocr/transformers; production sets the real engines.
+    deid_ocr_engine: Literal["paddle", "tesseract", "threshold"] = "threshold"
+    deid_phi_classifier: Literal["openmed", "deterministic"] = "deterministic"
+    # Comma-separated modalities whose detected text regions always route to
+    # human review regardless of confidence (criterion 3).  Default empty — a
+    # deployment opts specific modalities in.
+    deid_modalities_forced_review: str = ""
+    # Comma-separated "MODALITY:Manufacturer" pairs that have been measured
+    # against the recall floors and cleared for automated redaction (criterion
+    # 10).  Default empty — every source is unvalidated (forces review) until a
+    # pair is added after validation.
+    deid_validated_sources: str = ""
 
     # -- metering (D15/D18) --------------------------------------------------
     tenant_monthly_infra_ceiling_usd: float = 10.00
@@ -145,6 +159,12 @@ class Settings(BaseSettings):
     def _validate_env(self) -> Self:
         if self.environment == Environment.production and self.firestore_emulator_host is not None:
             raise ValueError("FIRESTORE_EMULATOR_HOST must be None when ENVIRONMENT=production")
+
+        # The pixel pass (OCR + OpenMed) is the only layer that can catch
+        # burned-in PHI.  Disabling it in production would silently allow PHI
+        # to leak at the pixel level — forbidden (criterion 6).
+        if self.environment == Environment.production and not self.deid_require_pixel_pass:
+            raise ValueError("DEID_REQUIRE_PIXEL_PASS cannot be False when ENVIRONMENT=production")
 
         # Region must be in the Vertex AI allowlist
         region = self.gcp_region.lower()
@@ -198,6 +218,27 @@ class Settings(BaseSettings):
     def is_production(self) -> bool:
         return self.environment == Environment.production
 
+    @property
+    def deid_forced_review_modalities(self) -> frozenset[str]:
+        """Parsed ``deid_modalities_forced_review`` as an upper-cased modality set."""
+        return _parse_csv_upper(self.deid_modalities_forced_review)
+
+    @property
+    def deid_validated_source_pairs(self) -> frozenset[tuple[str, str]]:
+        """Parsed ``deid_validated_sources`` as a set of ``(modality, manufacturer)``.
+
+        Entries are ``"MODALITY:Manufacturer"``; modality is upper-cased,
+        manufacturer is preserved as given (manufacturer names are case-sensitive).
+        """
+        pairs: set[tuple[str, str]] = set()
+        for item in self.deid_validated_sources.split(","):
+            item = item.strip()
+            if not item or ":" not in item:
+                continue
+            modality, manufacturer = item.split(":", 1)
+            pairs.add((modality.strip().upper(), manufacturer.strip()))
+        return frozenset(pairs)
+
     def assertion_fingerprint(self) -> str:
         """Deterministic fingerprint of security-critical values for the audit
         chain claimVersion, used to detect a config change mid-chain."""
@@ -219,3 +260,8 @@ class Settings(BaseSettings):
 # Singleton — validated at import time
 # ---------------------------------------------------------------------------
 settings = Settings()  # type: ignore[call-arg]
+
+
+def _parse_csv_upper(value: str) -> frozenset[str]:
+    """Parse a comma-separated string into an upper-cased frozenset."""
+    return frozenset(item.strip().upper() for item in value.split(",") if item.strip())
