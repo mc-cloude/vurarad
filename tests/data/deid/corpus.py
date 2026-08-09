@@ -139,7 +139,7 @@ def build_manifest() -> dict[str, Any]:
     return {"version": 1, "font": "DejaVuSans-Bold", "images": images}
 
 
-def load_manifest() -> dict[str, Any]:
+def load_manifest() -> Any:
     """Load the checked-in manifest.json."""
     with MANIFEST_PATH.open() as fh:
         return json.load(fh)
@@ -170,7 +170,7 @@ def render_image(entry: dict[str, Any]) -> CorpusImage:
         bbox = draw.textbbox((x, y), text, font=font)
         regions.append(
             GroundTruthRegion(
-                bbox=BBox(bbox[0], bbox[1], bbox[2], bbox[3]),
+                bbox=BBox(int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])),
                 text=text,
                 is_phi=bool(r["is_phi"]),
                 kind=str(r["kind"]),
