@@ -75,6 +75,7 @@ def _modality_recall() -> dict[str, tuple[int, int, float]]:
     recalled: dict[str, int] = defaultdict(int)
     total: dict[str, int] = defaultdict(int)
     from tests.data.deid.corpus import render_corpus  # lazy — tests/ excluded from mypy
+
     for img in render_corpus():
         detected = engine.detect(img.array)
         for gt in img.regions:
@@ -93,6 +94,7 @@ def generate_report() -> str:
     """Produce the full markdown validation report as a deterministic string."""
     recall = _modality_recall()
     from tests.data.deid.corpus import covered_pairs  # lazy — tests/ excluded from mypy
+
     pairs = sorted(covered_pairs())
 
     lines: list[str] = []
