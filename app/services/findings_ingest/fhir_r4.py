@@ -151,9 +151,7 @@ class FhirR4Adapter:
         by_id: dict[str, dict[str, Any]] = {
             r["id"]: r for r in resources if isinstance(r.get("id"), str)
         }
-        selections = {
-            r["id"]: r for r in resources if r.get("resourceType") == "ImagingSelection"
-        }
+        selections = {r["id"]: r for r in resources if r.get("resourceType") == "ImagingSelection"}
 
         observation_ids = self._observation_ids(resources, by_id)
         findings: list[AdapterFinding] = []

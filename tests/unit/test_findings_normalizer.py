@@ -202,9 +202,7 @@ class TestCadtStrip:
 # ---------------------------------------------------------------------------
 class TestPhiRedaction:
     def test_known_phi_redacted_from_free_text(self) -> None:
-        normalizer = _normalizer(
-            known_phi={"patient_name": "Doe, John", "mrn": "MRN-4471"}
-        )
+        normalizer = _normalizer(known_phi={"patient_name": "Doe, John", "mrn": "MRN-4471"})
         af = _adapter_finding(free_text="Nodule noted for Doe, John (MRN-4471)")
         nf, _ = normalizer.normalize(af, _vendor(cleared=True), "st_1", "ref")
         assert nf.redacted_free_text is not None
@@ -238,9 +236,7 @@ class TestPhiRedaction:
 class TestProvenance:
     def test_provenance_carries_vendor_and_ingest_ref(self) -> None:
         vendor = _vendor(cleared=True)
-        vendor = vendor.model_copy(
-            update={"payload_ref": "findings_ingest/fi_abc/source.dcm"}
-        )
+        vendor = vendor.model_copy(update={"payload_ref": "findings_ingest/fi_abc/source.dcm"})
         nf, _ = _normalizer().normalize(
             _adapter_finding(), vendor, "st_1", "findings_ingest/fi_abc"
         )

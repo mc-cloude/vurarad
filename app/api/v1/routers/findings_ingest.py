@@ -250,9 +250,7 @@ async def ingest_findings(
         }
     )
     normalizer = FindingNormalizer(phi_filter)
-    normalized, stats = normalizer.normalize_many(
-        adapter_findings, vendor, study_id, ingest_ref
-    )
+    normalized, stats = normalizer.normalize_many(adapter_findings, vendor, study_id, ingest_ref)
 
     for nf in normalized:
         await finding_service.create_finding(nf.finding)

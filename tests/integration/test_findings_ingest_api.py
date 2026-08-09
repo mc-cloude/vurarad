@@ -254,8 +254,7 @@ def _seed_study(
 
 def _ingest_url(study_id: str = STUDY_ID, adapter: str = "aidoc_v1", version: str = "1") -> str:
     return (
-        f"/api/v1/studies/{study_id}/findings/ingest"
-        f"?adapterName={adapter}&adapterVersion={version}"
+        f"/api/v1/studies/{study_id}/findings/ingest?adapterName={adapter}&adapterVersion={version}"
     )
 
 
@@ -468,9 +467,7 @@ class TestCadtStrip:
         counter_store: InMemoryCounterStore,
     ) -> None:
         _seed_study(doc_store)
-        resp = client.post(
-            _ingest_url(), content=_aidoc_payload(triage=True), headers=_auth()
-        )
+        resp = client.post(_ingest_url(), content=_aidoc_payload(triage=True), headers=_auth())
         assert resp.status_code == 200, resp.text
         body = resp.json()
         assert body["cadtFieldsDropped"] == 2  # triage + urgency
