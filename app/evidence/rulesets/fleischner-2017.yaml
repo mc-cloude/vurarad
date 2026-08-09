@@ -1,0 +1,79 @@
+# Fleischner Society 2017 — management of incidental pulmonary nodules detected on CT.
+# Statements are short summaries (≤ 300 chars), never reproduced article text.
+# The logic references the attribute fields of PulmonaryNoduleAttributes.
+id: fleischner-2017
+name: "Fleischner Society 2017 — Incidental Pulmonary Nodules"
+version: "2017.1"
+findingType: pulmonary_nodule
+reviewedBy: "VuraRAD Evidence Review Board"
+reviewedAt: "2024-01-15"
+citation:
+  doi: "10.1148/radiol.2017161659"
+  url: "https://doi.org/10.1148/radiol.2017161659"
+  title: "Guidelines for Management of Incidental Pulmonary Nodules Detected on CT Images: From the Fleischner Society 2017"
+rules:
+  - id: solid-single-under-6-low-risk
+    statement: "Single solid nodule under 6 mm in a low-risk patient: no routine follow-up required."
+    logic: "nodule_type == \"solid\" and nodule_count == \"single\" and diameter_mm < 6 and patient_risk == \"low\""
+    recommendation: "No routine CT follow-up."
+
+  - id: solid-single-under-6-high-risk
+    statement: "Single solid nodule under 6 mm in a high-risk patient: consider optional CT at 12 months."
+    logic: "nodule_type == \"solid\" and nodule_count == \"single\" and diameter_mm < 6 and patient_risk == \"high\""
+    recommendation: "Optional CT surveillance at 12 months."
+
+  - id: solid-single-6-to-8-low-risk
+    statement: "Single solid nodule 6 to 8 mm in a low-risk patient: CT surveillance at 6 to 12 and 18 to 24 months."
+    logic: "nodule_type == \"solid\" and nodule_count == \"single\" and diameter_mm >= 6 and diameter_mm < 8 and patient_risk == \"low\""
+    recommendation: "CT at 6-12 months, then 18-24 months."
+
+  - id: solid-single-6-to-8-high-risk
+    statement: "Single solid nodule 6 to 8 mm in a high-risk patient: CT surveillance at 6 to 12, 18 to 24, and 36 months."
+    logic: "nodule_type == \"solid\" and nodule_count == \"single\" and diameter_mm >= 6 and diameter_mm < 8 and patient_risk == \"high\""
+    recommendation: "CT at 6-12, 18-24, and 36 months."
+
+  - id: solid-single-8-or-more
+    statement: "Single solid nodule 8 mm or larger: consider CT at 3 months, PET-CT, or tissue sampling."
+    logic: "nodule_type == \"solid\" and nodule_count == \"single\" and diameter_mm >= 8"
+    recommendation: "CT at 3 months; consider PET-CT or tissue sampling."
+
+  - id: solid-multiple-under-6-low-risk
+    statement: "Multiple solid nodules under 6 mm in a low-risk patient: no routine follow-up required."
+    logic: "nodule_type == \"solid\" and nodule_count == \"multiple\" and diameter_mm < 6 and patient_risk == \"low\""
+    recommendation: "No routine CT follow-up."
+
+  - id: solid-multiple-under-6-high-risk
+    statement: "Multiple solid nodules under 6 mm in a high-risk patient: consider optional CT at 12 months."
+    logic: "nodule_type == \"solid\" and nodule_count == \"multiple\" and diameter_mm < 6 and patient_risk == \"high\""
+    recommendation: "Optional CT surveillance at 12 months."
+
+  - id: solid-multiple-6-to-8
+    statement: "Multiple solid nodules 6 to 8 mm: CT surveillance at 3 to 6 and 18 to 24 months."
+    logic: "nodule_type == \"solid\" and nodule_count == \"multiple\" and diameter_mm >= 6 and diameter_mm < 8"
+    recommendation: "CT at 3-6 months, then 18-24 months."
+
+  - id: solid-large-high-risk-review
+    statement: "Solid nodule 8 mm or larger in a high-risk patient: multidisciplinary review advised."
+    logic: "nodule_type == \"solid\" and diameter_mm >= 8 and patient_risk == \"high\""
+    recommendation: "Multidisciplinary review; consider PET-CT or tissue sampling."
+    notApplicableWhen: "nodule_count == \"multiple\""
+
+  - id: ground-glass-under-6
+    statement: "Ground-glass nodule under 6 mm: no routine follow-up required."
+    logic: "nodule_type == \"ground_glass\" and diameter_mm < 6"
+    recommendation: "No routine CT follow-up."
+
+  - id: ground-glass-6-or-more
+    statement: "Ground-glass nodule 6 mm or larger: CT surveillance at 6 to 12 and 18 to 24 months."
+    logic: "nodule_type == \"ground_glass\" and diameter_mm >= 6"
+    recommendation: "CT at 6-12 months, then 18-24 months."
+
+  - id: part-solid-under-6
+    statement: "Part-solid nodule under 6 mm: no routine follow-up required."
+    logic: "nodule_type == \"part_solid\" and diameter_mm < 6"
+    recommendation: "No routine CT follow-up."
+
+  - id: part-solid-6-or-more
+    statement: "Part-solid nodule 6 mm or larger: CT surveillance at 3 to 6, 9 to 12, and 18 to 24 months."
+    logic: "nodule_type == \"part_solid\" and diameter_mm >= 6"
+    recommendation: "CT at 3-6, 9-12, and 18-24 months."

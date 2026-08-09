@@ -1,0 +1,40 @@
+# ACR Incidental Findings Committee — management of the incidental adrenal mass on CT.
+# Statements are short summaries (≤ 300 chars), never reproduced article text.
+# The logic references the attribute fields of AdrenalIncidentalAttributes.
+id: acr-incidental-adrenal
+name: "ACR Incidental Adrenal Nodule Management"
+version: "2017.1"
+findingType: adrenal_incidental
+reviewedBy: "VuraRAD Evidence Review Board"
+reviewedAt: "2024-01-15"
+citation:
+  doi: "10.1016/j.jacr.2017.04.013"
+  url: "https://doi.org/10.1016/j.jacr.2017.04.013"
+  title: "Management of the Incidental Adrenal Mass on CT: A White Paper of the ACR Incidental Findings Committee"
+rules:
+  - id: adrenal-tiny-no-followup
+    statement: "Incidental adrenal nodule under 10 mm: no further workup required."
+    logic: "diameter_mm < 10"
+    recommendation: "No follow-up needed for an incidental adrenal nodule under 10 mm."
+
+  - id: adrenal-measure-attenuation
+    statement: "Adrenal nodule 10 to 40 mm without measured unenhanced attenuation: non-contrast CT advised."
+    logic: "diameter_mm >= 10 and diameter_mm <= 40"
+    recommendation: "Non-contrast CT recommended to measure unenhanced attenuation."
+    notApplicableWhen: "unenhanced_hu != None"
+
+  - id: adrenal-lipid-rich-adenoma
+    statement: "Adrenal nodule 10 to 40 mm with unenhanced attenuation 10 HU or less: consistent with lipid-rich adenoma."
+    logic: "diameter_mm >= 10 and diameter_mm <= 40 and unenhanced_hu <= 10"
+    recommendation: "Consistent with lipid-rich adenoma; no further workup."
+
+  - id: adrenal-indeterminate
+    statement: "Adrenal nodule 10 to 40 mm with unenhanced attenuation over 10 HU: indeterminate."
+    logic: "diameter_mm >= 10 and diameter_mm <= 40 and unenhanced_hu > 10"
+    recommendation: "Follow-up imaging at 6-12 months; consider contrast-enhanced CT."
+
+  - id: adrenal-large-or-growing
+    statement: "Adrenal nodule over 40 mm or with historical growth: surgical consultation advised."
+    logic: "diameter_mm > 40 or has_historical_growth"
+    recommendation: "Surgical consultation; consider resection."
+    notApplicableWhen: "diameter_mm < 10"
