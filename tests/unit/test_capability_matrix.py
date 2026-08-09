@@ -66,6 +66,7 @@ def test_radiologist_capabilities() -> None:
             Capability.REPORT_ADDENDUM,
             Capability.IMAGING_ACCESS,
             Capability.AI_DRAFT,
+            Capability.MONAILABEL_USE,
             Capability.BREAK_GLASS,
             Capability.RESEARCH_COHORT_CREATE,
             Capability.RESEARCH_FEATURES_READ,
@@ -110,3 +111,4 @@ def test_has_capability_true_false() -> None:
 def test_is_phi_capability() -> None:
     assert is_phi_capability(Capability.STUDY_READ) is True
     assert is_phi_capability(Capability.AUDIT_READ) is False
+    assert is_phi_capability(Capability.MONAILABEL_USE) is True

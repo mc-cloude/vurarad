@@ -137,6 +137,47 @@ class AuditStoreNotImmutableError(ApiError):
     message = "Audit store does not enforce bucket lock (WORM)"
 
 
+# -- licence / proxy errors -------------------------------------------------
+class FeatureNotLicensedError(ApiError):
+    """A licence feature flag gate is closed (e.g. ``features.slicer_addon``).
+
+    Raised by the MONAI Label proxy when the tenant licence does not include the
+    desktop add-on feature (acceptance criterion 4).
+    """
+
+    code = ErrorCode.FEATURE_NOT_LICENSED
+    status_code = 403
+    message = "Feature is not licensed for this tenant"
+
+
+class PayloadTooLargeError(ApiError):
+    """A proxied request or response exceeds the configured size bound.
+
+    The MONAI Label proxy bounds both directions and never streams unbounded
+    bytes (acceptance criterion 3).
+    """
+
+    code = ErrorCode.PAYLOAD_TOO_LARGE
+    status_code = 413
+    message = "Payload exceeds the maximum allowed size"
+
+
+class UpstreamTimeoutError(ApiError):
+    """The upstream MONAI Label backend did not respond within the timeout."""
+
+    code = ErrorCode.UPSTREAM_TIMEOUT
+    status_code = 504
+    message = "Upstream backend timed out"
+
+
+class UpstreamUnavailableError(ApiError):
+    """The upstream MONAI Label backend could not be reached."""
+
+    code = ErrorCode.UPSTREAM_UNAVAILABLE
+    status_code = 502
+    message = "Upstream backend is unavailable"
+
+
 # -- envelope ----------------------------------------------------------------
 def _make_error_body(
     code: ErrorCode,

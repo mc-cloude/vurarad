@@ -237,3 +237,74 @@ def test_studies_routes_have_phi_capability_check() -> None:
         assert "_require" in names or "require_patient_identity_access" in names, (
             f"Route {method} {path} missing PHI capability check"
         )
+
+
+# --------------------------------------------------------------------------- #
+# /api/v1/monailabel/* + /api/v1/licence route security (WP20)
+# --------------------------------------------------------------------------- #
+def _monailabel_routes(app: FastAPI) -> list[tuple[str, str, APIRoute]]:
+    """Filter to the desktop add-on proxy route only."""
+    return [
+        (m, p, r)
+        for m, p, r in _collect_api_routes(app)
+        if p.startswith("/api/v1/monailabel/")
+    ]
+
+
+def _licence_routes(app: FastAPI) -> list[tuple[str, str, APIRoute]]:
+    """Filter to the licence route only."""
+    return [(m, p, r) for m, p, r in _collect_api_routes(app) if p == "/api/v1/licence"]
+
+
+def test_monailabel_route_count_is_two() -> None:
+    """The desktop add-on package exposes exactly two routes (proxy + licence)."""
+    app = create_app()
+    assert len(_monailabel_routes(app)) == 1, "Expected 1 monailabel proxy route"
+    assert len(_licence_routes(app)) == 1, "Expected 1 licence route"
+
+
+def test_monailabel_proxy_route_requires_auth_mfa_and_capability() -> None:
+    """The proxy route must carry auth, MFA, and exactly one capability (criterion 2)."""
+    from app.core.capabilities import Capability
+
+    app = create_app()
+    for method, path, route in _monailabel_routes(app):
+        names = _dep_names(route)
+        assert "get_current_user" in names, f"Route {method} {path} missing get_current_user"
+        assert "require_mfa" in names, f"Route {method} {path} missing require_mfa"
+        caps = _require_capability_calls(route)
+        assert len(caps) == 1, (
+            f"Route {method} {path} declares {len(caps)} capabilities, expected 1"
+        )
+        cap = _extract_capability(caps[0])
+        assert cap == Capability.MONAILABEL_USE, (
+            f"Route {method} {path} capability is {cap}, expected monailabel:use"
+        )
+
+
+def test_monailabel_proxy_route_has_no_path_study_param() -> None:
+    """The referenced study is declared via the X-Study-Id header, not a path param.
+
+    Study authorization is enforced inside the proxy service (tenant scope +
+    StudyAccessPolicy) before the proxy hop — it is NOT a ``resolve_study``
+    route dependency, so the route path carries no study-identifier parameter.
+    """
+    app = create_app()
+    for _method, path, route in _monailabel_routes(app):
+        assert "{study" not in path, f"Route {path} must not carry a study path param"
+        names = _dep_names(route)
+        assert "resolve_study" not in names, (
+            f"Route {path} must not depend on resolve_study (study auth is in-service)"
+        )
+
+
+def test_licence_route_requires_authentication_only() -> None:
+    """``GET /licence`` must require auth but NOT MFA or a PHI capability."""
+    app = create_app()
+    for method, path, route in _licence_routes(app):
+        names = _dep_names(route)
+        assert "get_current_user" in names, f"Route {method} {path} missing get_current_user"
+        assert "require_mfa" not in names, f"Route {method} {path} must not require MFA"
+        assert "_require" not in names, (
+            f"Route {method} {path} must not require a PHI capability"
+        )

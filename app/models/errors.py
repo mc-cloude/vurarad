@@ -50,6 +50,11 @@ class ErrorCode(StrEnum):
     SPEND_OVERAGE = "SPEND_OVERAGE"
     SPEND_SUSPENDED = "SPEND_SUSPENDED"
     LICENCE_EXPIRED = "LICENCE_EXPIRED"
+    FEATURE_NOT_LICENSED = "FEATURE_NOT_LICENSED"
+
+    # -- proxy / desktop add-on ----------------------------------------------
+    PAYLOAD_TOO_LARGE = "PAYLOAD_TOO_LARGE"
+    UPSTREAM_TIMEOUT = "UPSTREAM_TIMEOUT"
 
     # -- audit ---------------------------------------------------------------
     AUDIT_CHAIN_BROKEN = "AUDIT_CHAIN_BROKEN"

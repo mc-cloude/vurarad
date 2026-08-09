@@ -29,6 +29,12 @@ class Capability(StrEnum):
     AI_DRAFT = "ai:draft"
     AI_FULL = "ai:full"
 
+    # -- desktop add-on ------------------------------------------------------
+    # Gates the MONAI Label authorization proxy (WP20).  Grants the right to
+    # invoke the proxy; study-level access is still enforced by
+    # StudyAccessPolicy on every request.
+    MONAILABEL_USE = "monailabel:use"
+
     # -- administration ------------------------------------------------------
     AUDIT_READ = "audit:read"
     AUDIT_EXPORT = "audit:export"
@@ -58,6 +64,7 @@ PHI_CAPABILITIES: frozenset[Capability] = frozenset(
         Capability.IMAGING_ACCESS,
         Capability.AI_DRAFT,
         Capability.AI_FULL,
+        Capability.MONAILABEL_USE,
         Capability.COMPLIANCE_PURGE,
         Capability.BREAK_GLASS,
         Capability.RESEARCH_COHORT_CREATE,
@@ -108,6 +115,7 @@ ROLE_CAPABILITIES: dict[Role, frozenset[Capability]] = {
             Capability.REPORT_ADDENDUM,
             Capability.IMAGING_ACCESS,
             Capability.AI_DRAFT,
+            Capability.MONAILABEL_USE,
             Capability.BREAK_GLASS,
             Capability.RESEARCH_COHORT_CREATE,
             Capability.RESEARCH_FEATURES_READ,
