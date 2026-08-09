@@ -84,6 +84,33 @@ class StudyRepository:
             return None
         return _study_record_from_doc(doc)
 
+    # -- priors (reads == matching studies) ----------------------------------
+    async def get_studies_by_patient_key(
+        self,
+        patient_key: str,
+        *,
+        exclude_study_id: str | None = None,
+        limit: int = 500,
+    ) -> list[StudyRecord]:
+        """Return every study sharing ``patientKey`` (prior-study resolution).
+
+        Used by :class:`PriorStudyService` to resolve comparison priors for a
+        study.  Reads equal the number of matching studies.  The caller
+        authorizes each result independently.
+        """
+        rows = await self._store.query(
+            STUDIES_COLLECTION,
+            where=[("patientKey", "==", patient_key)],
+            limit=limit,
+        )
+        records: list[StudyRecord] = []
+        for _doc_id, doc in rows:
+            rec = _study_record_from_doc(doc)
+            if exclude_study_id is not None and rec.study_id == exclude_study_id:
+                continue
+            records.append(rec)
+        return records
+
     # -- series reads (1 read per series) ------------------------------------
     async def get_series_by_id(self, series_id: str) -> Series | None:
         """Read a series document by its internal id — 1 Firestore read.

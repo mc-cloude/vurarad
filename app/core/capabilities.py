@@ -29,6 +29,9 @@ class Capability(StrEnum):
     AI_DRAFT = "ai:draft"
     AI_FULL = "ai:full"
 
+    # -- viewer / reporting content (non-PHI) --------------------------------
+    TEMPLATE_READ = "template:read"
+
     # -- administration ------------------------------------------------------
     AUDIT_READ = "audit:read"
     AUDIT_EXPORT = "audit:export"
@@ -93,6 +96,7 @@ ROLE_CAPABILITIES: dict[Role, frozenset[Capability]] = {
             Capability.STUDY_READ,
             Capability.STUDY_SEARCH,
             Capability.REPORT_READ,
+            Capability.TEMPLATE_READ,
         }
     ),
     Role.RADIOLOGIST: frozenset(
@@ -112,6 +116,7 @@ ROLE_CAPABILITIES: dict[Role, frozenset[Capability]] = {
             Capability.RESEARCH_COHORT_CREATE,
             Capability.RESEARCH_FEATURES_READ,
             Capability.RESEARCH_EXPORT,
+            Capability.TEMPLATE_READ,
         }
     ),
 }

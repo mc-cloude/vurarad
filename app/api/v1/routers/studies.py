@@ -21,6 +21,7 @@ from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import JSONResponse
 
 from app.api.v1.routers.studies_deps import (
+    PriorStudyServiceDep,
     SettingsDep,
     StudyServiceDep,
     ViewerScopeDep,
@@ -33,6 +34,7 @@ from app.core.errors import InvalidQueryParameterError
 from app.models.study import (
     AccessUrlChunk,
     PatientIdentity,
+    PriorStudyListResponse,
     SearchResult,
     SeriesListResponse,
     StudyDetail,
@@ -179,3 +181,26 @@ async def get_access_urls(
         content=chunk.model_dump(by_alias=True),
         headers={"Cache-Control": "private, no-store"},
     )
+
+
+# ---------------------------------------------------------------------------
+# GET /studies/{studyId}/priors — compare-prior viewer (WP9)
+# ---------------------------------------------------------------------------
+@router.get(
+    "/{study_id}/priors",
+    dependencies=[Depends(require_phi_capability(Capability.STUDY_READ))],
+    response_model=PriorStudyListResponse,
+)
+async def get_priors(
+    study_id: str,
+    prior_study_service: PriorStudyServiceDep,
+    viewer_scope: ViewerScopeDep,
+    user: AuthenticatedUser = Depends(get_current_user),
+) -> PriorStudyListResponse:
+    """Return same-``patientKey`` priors, each authorized independently.
+
+    A prior the caller may not read (e.g. assigned to another radiologist) is
+    omitted — the request never 403s for an omitted prior.  Priors carry
+    ``patientRef`` only; no patient name is released.
+    """
+    return await prior_study_service.get_priors(user, study_id, viewer_scope)

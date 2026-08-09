@@ -341,29 +341,68 @@ def _study_detail_from_record(study: StudyRecord) -> StudyDetail:
 
 
 def _series_summary_from_model(series: Series) -> SeriesSummary:
-    """Build a :class:`SeriesSummary` from a :class:`Series` model."""
+    """Build a :class:`SeriesSummary` from a :class:`Series` model.
+
+    For multi-frame objects (any instance with ``numberOfFrames > 1``) each
+    SOP instance is expanded into one :class:`InstanceGeometry` per logical
+    frame with a dense, gapless ``stackIndex`` across the whole series and a
+    per-frame ``frameIndex`` (§3.5 / WP9).  Single-frame series keep the
+    existing one-entry-per-instance shape with ``frameIndex`` null, so the
+    wire contract for ordinary CT/MR series is unchanged.
+    """
+    is_multi_frame = series.is_multi_frame or any(
+        i.number_of_frames > 1 for i in series.instances
+    )
     instances: list[InstanceGeometry] = []
     total_bytes = 0
-    for inst in sorted(series.instances, key=lambda i: i.stack_index):
-        total_bytes += inst.size_bytes
-        instances.append(
-            InstanceGeometry(
-                instance_uid=inst.sop_instance_uid,
-                sop_instance_uid=inst.sop_instance_uid,
-                stack_index=inst.stack_index,
-                instance_number=inst.instance_number,
-                object_path=inst.object_path,
-                size_bytes=inst.size_bytes,
-                image_position_patient=inst.image_position_patient,
-                image_orientation_patient=inst.image_orientation_patient,
-                slice_location=inst.slice_location,
-                number_of_frames=inst.number_of_frames,
-                window_center=inst.window_center,
-                window_width=inst.window_width,
-                rescale_slope=inst.rescale_slope,
-                rescale_intercept=inst.rescale_intercept,
+    if is_multi_frame:
+        dense = 0
+        for inst in sorted(series.instances, key=lambda i: i.stack_index):
+            total_bytes += inst.size_bytes
+            frame_count = max(1, inst.number_of_frames)
+            for frame_index in range(frame_count):
+                instances.append(
+                    InstanceGeometry(
+                        instance_uid=inst.sop_instance_uid,
+                        sop_instance_uid=inst.sop_instance_uid,
+                        stack_index=dense,
+                        instance_number=inst.instance_number,
+                        frame_index=frame_index,
+                        object_path=inst.object_path,
+                        size_bytes=inst.size_bytes,
+                        image_position_patient=inst.image_position_patient,
+                        image_orientation_patient=inst.image_orientation_patient,
+                        slice_location=inst.slice_location,
+                        number_of_frames=inst.number_of_frames,
+                        window_center=inst.window_center,
+                        window_width=inst.window_width,
+                        rescale_slope=inst.rescale_slope,
+                        rescale_intercept=inst.rescale_intercept,
+                    )
+                )
+                dense += 1
+    else:
+        for inst in sorted(series.instances, key=lambda i: i.stack_index):
+            total_bytes += inst.size_bytes
+            instances.append(
+                InstanceGeometry(
+                    instance_uid=inst.sop_instance_uid,
+                    sop_instance_uid=inst.sop_instance_uid,
+                    stack_index=inst.stack_index,
+                    instance_number=inst.instance_number,
+                    frame_index=None,
+                    object_path=inst.object_path,
+                    size_bytes=inst.size_bytes,
+                    image_position_patient=inst.image_position_patient,
+                    image_orientation_patient=inst.image_orientation_patient,
+                    slice_location=inst.slice_location,
+                    number_of_frames=inst.number_of_frames,
+                    window_center=inst.window_center,
+                    window_width=inst.window_width,
+                    rescale_slope=inst.rescale_slope,
+                    rescale_intercept=inst.rescale_intercept,
+                )
             )
-        )
     # Derive series-level geometry from the first instance when available.
     first = series.instances[0] if series.instances else None
     pixel_spacing = first.pixel_spacing if first else None
@@ -374,6 +413,7 @@ def _series_summary_from_model(series: Series) -> SeriesSummary:
         instance_count=series.instance_count,
         frame_count=series.frame_count,
         is_multi_frame=series.is_multi_frame,
+        per_frame_functional_groups=is_multi_frame,
         pixel_spacing=pixel_spacing,
         spacing_between_slices_mm=spacing,
         series_bytes=total_bytes,

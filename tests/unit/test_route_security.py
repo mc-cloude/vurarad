@@ -202,11 +202,11 @@ def _studies_routes(app: FastAPI) -> list[tuple[str, str, APIRoute]]:
     ]
 
 
-def test_studies_route_count_is_six() -> None:
-    """The studies package exposes exactly six routes (§3.3–3.6)."""
+def test_studies_route_count_is_seven() -> None:
+    """The studies package exposes exactly seven routes (§3.3–3.6 + priors)."""
     app = create_app()
     routes = _studies_routes(app)
-    assert len(routes) == 6, f"Expected 6 studies routes, got {len(routes)}"
+    assert len(routes) == 7, f"Expected 7 studies routes, got {len(routes)}"
 
 
 def test_studies_routes_require_auth_and_mfa() -> None:
@@ -237,3 +237,82 @@ def test_studies_routes_have_phi_capability_check() -> None:
         assert "_require" in names or "require_patient_identity_access" in names, (
             f"Route {method} {path} missing PHI capability check"
         )
+
+
+# ---------------------------------------------------------------------------
+# /api/v1/report-templates/* route security (WP9 — §3.5 templates)
+# ---------------------------------------------------------------------------
+def _templates_routes(app: FastAPI) -> list[tuple[str, str, APIRoute]]:
+    """Filter to /api/v1/report-templates routes only."""
+    return [
+        (m, p, r)
+        for m, p, r in _collect_api_routes(app)
+        if p.startswith("/api/v1/report-templates")
+    ]
+
+
+def test_templates_route_count_is_two() -> None:
+    """The templates package exposes exactly two routes (list + retrieve)."""
+    app = create_app()
+    routes = _templates_routes(app)
+    assert len(routes) == 2, f"Expected 2 templates routes, got {len(routes)}"
+    paths = {p for _m, p, _r in routes}
+    assert "/api/v1/report-templates" in paths
+    assert any(p.startswith("/api/v1/report-templates/{") for p in paths)
+
+
+def test_templates_routes_require_auth_and_mfa() -> None:
+    """Every /api/v1/report-templates/* route must carry auth and MFA."""
+    app = create_app()
+    for method, path, route in _templates_routes(app):
+        names = _dep_names(route)
+        assert "get_current_user" in names, f"Route {method} {path} missing get_current_user"
+        assert "require_mfa" in names, f"Route {method} {path} missing require_mfa"
+
+
+def test_templates_routes_declare_template_read_capability() -> None:
+    """Every templates route declares exactly one TEMPLATE_READ capability."""
+    from app.core.capabilities import Capability
+
+    app = create_app()
+    for method, path, route in _templates_routes(app):
+        caps = _require_capability_calls(route)
+        assert len(caps) == 1, (
+            f"Route {method} {path} declares {len(caps)} capabilities, expected 1"
+        )
+        cap = _extract_capability(caps[0])
+        assert cap == Capability.TEMPLATE_READ, (
+            f"Route {method} {path} has capability {cap}, expected TEMPLATE_READ"
+        )
+
+
+def test_no_templates_route_in_public_routes() -> None:
+    """No /api/v1/report-templates path may appear in PUBLIC_ROUTES."""
+    for _method, path in PUBLIC_ROUTES:
+        assert not path.startswith("/api/v1/report-templates"), (
+            f"templates route {path} must not be in PUBLIC_ROUTES"
+        )
+
+
+# ---------------------------------------------------------------------------
+# /api/v1/studies/{studyId}/priors — route security (WP9 — compare-prior)
+# ---------------------------------------------------------------------------
+def test_priors_route_is_present_and_secured() -> None:
+    """GET /studies/{studyId}/priors exists and carries auth, MFA, and STUDY_READ."""
+    app = create_app()
+    routes = _studies_routes(app)
+    priors = [(m, p, r) for m, p, r in routes if p.endswith("/priors")]
+    assert len(priors) == 1, f"Expected one priors route, got {len(priors)}"
+    method, path, route = priors[0]
+    assert method == "GET"
+    assert path == "/api/v1/studies/{study_id}/priors"
+    names = _dep_names(route)
+    assert "get_current_user" in names
+    assert "require_mfa" in names
+    # The priors route is gated by STUDY_READ (a PHI capability) like the rest
+    # of the studies package, so admin gets PHI_ACCESS_FORBIDDEN.
+    caps = _require_capability_calls(route)
+    assert len(caps) == 1
+    from app.core.capabilities import Capability
+
+    assert _extract_capability(caps[0]) == Capability.STUDY_READ

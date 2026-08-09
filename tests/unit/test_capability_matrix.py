@@ -48,6 +48,7 @@ def test_viewer_capabilities() -> None:
             Capability.STUDY_READ,
             Capability.STUDY_SEARCH,
             Capability.REPORT_READ,
+            Capability.TEMPLATE_READ,
         }
     )
 
@@ -70,6 +71,7 @@ def test_radiologist_capabilities() -> None:
             Capability.RESEARCH_COHORT_CREATE,
             Capability.RESEARCH_FEATURES_READ,
             Capability.RESEARCH_EXPORT,
+            Capability.TEMPLATE_READ,
         }
     )
 
@@ -110,3 +112,21 @@ def test_has_capability_true_false() -> None:
 def test_is_phi_capability() -> None:
     assert is_phi_capability(Capability.STUDY_READ) is True
     assert is_phi_capability(Capability.AUDIT_READ) is False
+
+
+# ---------------------------------------------------------------------------
+# TEMPLATE_READ — non-PHI, granted to clinical/report-facing roles (WP9)
+# ---------------------------------------------------------------------------
+def test_template_read_is_not_phi() -> None:
+    """TEMPLATE_READ gates static non-PHI content — it is not a PHI capability."""
+    assert is_phi_capability(Capability.TEMPLATE_READ) is False
+
+
+def test_template_read_granted_to_viewer_and_radiologist_only() -> None:
+    assert has_capability(Role.VIEWER, Capability.TEMPLATE_READ) is True
+    assert has_capability(Role.RADIOLOGIST, Capability.TEMPLATE_READ) is True
+    # Admin is non-clinical and does not read report templates.
+    assert has_capability(Role.ADMIN, Capability.TEMPLATE_READ) is False
+    # Separation of duties still holds — TEMPLATE_READ is non-PHI so even its
+    # absence from admin keeps admin ∩ PHI == ∅.
+    assert ROLE_CAPABILITIES[Role.ADMIN] & PHI_CAPABILITIES == frozenset()

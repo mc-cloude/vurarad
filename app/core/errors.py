@@ -72,6 +72,18 @@ class NotFoundError(ApiError):
     message = "Resource not found"
 
 
+class TemplateNotFoundError(NotFoundError):
+    """A report template id was not found in the catalogue (WP9).
+
+    Distinct from ``NOT_FOUND`` so a client can tell a missing template from a
+    missing study.  Raised by :class:`TemplateService.get_template`.
+    """
+
+    code = ErrorCode.TEMPLATE_NOT_FOUND
+    status_code = 404
+    message = "Report template not found"
+
+
 class SearchFilterRequiredError(ApiError):
     code = ErrorCode.SEARCH_FILTER_REQUIRED
     status_code = 422

@@ -57,6 +57,38 @@ class PriorStudyRef(CamelModel):
     description: str = ""
 
 
+class PriorStudy(CamelModel):
+    """A resolved prior study for the compare-prior viewer (WP9).
+
+    Carries ``patientRef`` only — never a patient name, DOB, or MRN.  Each
+    prior is independently authorized through :class:`StudyAccessPolicy`; a
+    prior the caller may not read is omitted from the list rather than
+    failing the whole request (§3.5 / WP9).
+    """
+
+    study_id: str
+    patient_ref: str = ""
+    study_date: str = ""
+    modality: str = ""
+    body_part: str = ""
+    description: str = ""
+    status: StudyStatus = StudyStatus.UNREAD
+
+
+class PriorStudyListResponse(CamelModel):
+    """The ``GET /studies/{studyId}/priors`` response.
+
+    ``omittedCount`` reports how many same-``patientKey`` priors were withheld
+    because the caller lacked per-prior read access (e.g. assigned to another
+    radiologist).  The request itself never 403s for an omitted prior.
+    """
+
+    study_id: str
+    patient_ref: str
+    priors: list[PriorStudy]
+    omitted_count: int = 0
+
+
 # ---------------------------------------------------------------------------
 # Worklist (§3.3)
 # ---------------------------------------------------------------------------
@@ -149,16 +181,23 @@ class StudyDetail(CamelModel):
 # Series + geometry (§3.5)
 # ---------------------------------------------------------------------------
 class InstanceGeometry(CamelModel):
-    """One instance with spatial geometry — server-computed ``stackIndex``.
+    """One logical frame with spatial geometry — server-computed ``stackIndex``.
 
     ``imagePositionPatient``, ``imageOrientationPatient``, ``sliceLocation``,
     ``numberOfFrames``, ``stackIndex`` are the geometry contract ``[B6]``.
+
+    For multi-frame objects a single SOP instance carries ``numberOfFrames > 1``
+    frames; the series listing expands it into one :class:`InstanceGeometry`
+    per logical frame (``frameIndex`` 0..N-1) so the viewer receives a flat,
+    dense ``stackIndex`` sequence across the whole series (§3.5 / WP9).
+    ``frameIndex`` is ``null`` for single-frame instances.
     """
 
     instance_uid: str = ""
     sop_instance_uid: str
     stack_index: int
     instance_number: int | None = None
+    frame_index: int | None = None
     object_path: str = ""
     size_bytes: int = 0
     image_position_patient: list[float] | None = None
@@ -182,6 +221,7 @@ class SeriesSummary(CamelModel):
     instance_count: int = 0
     frame_count: int = 0
     is_multi_frame: bool = False
+    per_frame_functional_groups: bool = False
     rows: int = 0
     columns: int = 0
     pixel_spacing: list[float] | None = None

@@ -25,6 +25,7 @@ from app.repositories.base import DocumentStore, FirestoreDocumentStore
 from app.repositories.patient_repo import PatientRepository
 from app.repositories.study_repo import StudyRepository
 from app.services.audit_service import AuditMirror, AuditService
+from app.services.prior_study_service import PriorStudyService
 from app.services.signed_url_service import SignedUrlService
 from app.services.study_service import StudyService
 from app.storage.base import ObjectStore
@@ -34,6 +35,7 @@ __all__ = [
     "require_phi_capability",
     "require_patient_identity_access",
     "StudyServiceDep",
+    "PriorStudyServiceDep",
     "ViewerScopeDep",
     "require_mfa",
 ]
@@ -211,6 +213,16 @@ async def get_study_service(
 
 
 StudyServiceDep = Annotated[StudyService, Depends(get_study_service)]
+
+
+# ---------------------------------------------------------------------------
+# Prior-study service (WP9 — compare-prior viewer)
+# ---------------------------------------------------------------------------
+async def get_prior_study_service(study_repo: StudyRepoDep) -> PriorStudyService:
+    return PriorStudyService(study_repo)
+
+
+PriorStudyServiceDep = Annotated[PriorStudyService, Depends(get_prior_study_service)]
 
 
 # ---------------------------------------------------------------------------

@@ -478,3 +478,102 @@ class TestNoGeometry:
         )
         s = _series_payload(client)
         assert s["stackOrderConfidence"] != "RELIABLE"
+
+
+# ---------------------------------------------------------------------------
+# Multi-frame geometry on the wire (§3.5 / WP9)
+# ---------------------------------------------------------------------------
+class TestMultiFrameGeometryOnWire:
+    """Multi-frame series expose numberOfFrames, perFrameFunctionalGroups, and
+    a dense, gapless per-frame ``stackIndex`` (criterion 4).
+
+    A multi-frame SOP instance carries ``numberOfFrames > 1`` frames; the
+    series listing expands it into one logical-frame entry per frame so the
+    viewer receives a flat, dense ``stackIndex`` sequence spanning the whole
+    series.
+    """
+
+    @staticmethod
+    def _multiframe_series() -> Series:
+        # Two multi-frame SOP instances: 4 frames + 3 frames = 7 logical frames.
+        inst0 = Instance(
+            sop_instance_uid="1.2.3.100",
+            stack_index=0,
+            instance_number=1,
+            number_of_frames=4,
+            image_position_patient=[0.0, 0.0, 0.0],
+            image_orientation_patient=AXIAL_IOP,
+            slice_location=0.0,
+            size_bytes=2097152,
+            object_path="studies/st_geom/se_mf/0000.dcm",
+        )
+        inst1 = Instance(
+            sop_instance_uid="1.2.3.101",
+            stack_index=1,
+            instance_number=2,
+            number_of_frames=3,
+            image_position_patient=[0.0, 0.0, 20.0],
+            image_orientation_patient=AXIAL_IOP,
+            slice_location=20.0,
+            size_bytes=1572864,
+            object_path="studies/st_geom/se_mf/0001.dcm",
+        )
+        return Series(
+            series_id="se_mf",
+            study_id="st_geom",
+            study_instance_uid="1.2.840.113619.2.55.3.604688119.971",
+            series_instance_uid="1.2.840.113619.2.55.3.se_mf",
+            modality="CT",
+            sop_class_uid="1.2.840.10008.5.1.4.1.1.2",
+            stack_order_basis=StackOrderBasis.FRAME_INDEX,
+            stack_order_confidence=StackOrderConfidence.RELIABLE,
+            instance_count=2,
+            frame_count=7,
+            is_multi_frame=True,
+            instances=[inst0, inst1],
+            created_at="2026-08-01T09:20:11Z",
+        )
+
+    def test_series_exposes_multiframe_flags(
+        self, client: TestClient, doc_store: InMemoryDocumentStore
+    ) -> None:
+        _seed_series(doc_store, self._multiframe_series())
+        s = _series_payload(client)
+        assert s["isMultiFrame"] is True
+        assert s["perFrameFunctionalGroups"] is True
+        assert s["instanceCount"] == 2
+        assert s["frameCount"] == 7
+
+    def test_instances_expanded_to_per_frame_entries(
+        self, client: TestClient, doc_store: InMemoryDocumentStore
+    ) -> None:
+        _seed_series(doc_store, self._multiframe_series())
+        s = _series_payload(client)
+        frames = s["instances"]
+        # 4 + 3 = 7 logical frames on the wire.
+        assert len(frames) == 7
+        # Dense, gapless, zero-based stackIndex across the whole series.
+        assert [f["stackIndex"] for f in frames] == [0, 1, 2, 3, 4, 5, 6]
+        assert len({f["stackIndex"] for f in frames}) == 7
+        # frameIndex cycles within each parent SOP instance.
+        assert [f["frameIndex"] for f in frames] == [0, 1, 2, 3, 0, 1, 2]
+        # numberOfFrames is the parent instance frame count on every frame.
+        assert [f["numberOfFrames"] for f in frames] == [4, 4, 4, 4, 3, 3, 3]
+        # Each frame carries the SOP instance UID of its parent object.
+        assert [f["sopInstanceUid"] for f in frames] == ["1.2.3.100"] * 4 + [
+            "1.2.3.101"
+        ] * 3
+
+    def test_single_frame_series_has_no_per_frame_functional_groups(
+        self, client: TestClient, doc_store: InMemoryDocumentStore
+    ) -> None:
+        """Single-frame series keep the existing contract: frameIndex null, no
+        perFrameFunctionalGroups flag, dense stackIndex per instance."""
+        _seed_series(doc_store, _series(5))
+        s = _series_payload(client)
+        assert s["isMultiFrame"] is False
+        assert s["perFrameFunctionalGroups"] is False
+        for f in s["instances"]:
+            assert f["frameIndex"] is None
+            assert f["numberOfFrames"] == 1
+        assert [f["stackIndex"] for f in s["instances"]] == [0, 1, 2, 3, 4]
