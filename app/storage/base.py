@@ -40,6 +40,7 @@ class ObjectMetadata:
     etag: str
     updated: datetime
     metadata: dict[str, str] = field(default_factory=dict)
+    cache_control: str | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -116,6 +117,23 @@ class ObjectStore(Protocol):
 
     async def copy(self, src_key: str, dst_key: str) -> ObjectRef:
         """Copy ``src_key`` to ``dst_key`` within the same bucket."""
+        ...
+
+    async def rewrite(
+        self,
+        src_key: str,
+        dst_key: str,
+        *,
+        cache_control: str | None = None,
+        metadata: Mapping[str, str] | None = None,
+    ) -> ObjectRef:
+        """Server-side copy of ``src_key`` to ``dst_key``.
+
+        No object bytes are transferred through the application.  When
+        ``cache_control`` is given it is set as the destination object's
+        ``Cache-Control`` metadata (e.g. ``private, no-store`` ``[B10]``); when
+        ``metadata`` is given it replaces the destination's custom metadata.
+        """
         ...
 
     async def object_metadata(self, key: str) -> ObjectMetadata:

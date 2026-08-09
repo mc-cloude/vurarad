@@ -110,6 +110,28 @@ class MinioObjectStore:
         )
         return ObjectRef(bucket=self._bucket_name, key=dst_key)
 
+    def _rewrite_sync(
+        self,
+        src_key: str,
+        dst_key: str,
+        cache_control: str | None,
+        metadata: Mapping[str, str] | None,
+    ) -> ObjectRef:
+        # Server-side copy with MetadataDirective=REPLACE so the destination's
+        # Cache-Control / custom metadata are set without downloading bytes.
+        params: dict[str, Any] = {
+            "Bucket": self._bucket_name,
+            "Key": dst_key,
+            "CopySource": {"Bucket": self._bucket_name, "Key": src_key},
+            "MetadataDirective": "REPLACE",
+        }
+        if metadata is not None:
+            params["Metadata"] = dict(metadata)
+        if cache_control is not None:
+            params["CacheControl"] = cache_control
+        self._client.copy_object(**params)
+        return ObjectRef(bucket=self._bucket_name, key=dst_key)
+
     def _object_metadata_sync(self, key: str) -> ObjectMetadata:
         resp = self._client.head_object(Bucket=self._bucket_name, Key=key)
         return ObjectMetadata(
@@ -119,6 +141,7 @@ class MinioObjectStore:
             etag=resp.get("ETag", "").strip('"'),
             updated=resp.get("LastModified", datetime.now(UTC)),
             metadata=dict(resp.get("Metadata", {})),
+            cache_control=resp.get("CacheControl") or None,
         )
 
     def _signed_read_url_sync(
@@ -240,6 +263,18 @@ class MinioObjectStore:
 
     async def copy(self, src_key: str, dst_key: str) -> ObjectRef:
         return await asyncio.to_thread(self._copy_sync, src_key, dst_key)
+
+    async def rewrite(
+        self,
+        src_key: str,
+        dst_key: str,
+        *,
+        cache_control: str | None = None,
+        metadata: Mapping[str, str] | None = None,
+    ) -> ObjectRef:
+        return await asyncio.to_thread(
+            self._rewrite_sync, src_key, dst_key, cache_control, metadata
+        )
 
     async def object_metadata(self, key: str) -> ObjectMetadata:
         return await asyncio.to_thread(self._object_metadata_sync, key)

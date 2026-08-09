@@ -21,6 +21,7 @@ class ErrorCode(StrEnum):
     CONFLICT = "CONFLICT"
     IDEMPOTENCY_MISMATCH = "IDEMPOTENCY_MISMATCH"
     PHI_ACCESS_FORBIDDEN = "PHI_ACCESS_FORBIDDEN"
+    INGEST_IN_PROGRESS = "INGEST_IN_PROGRESS"
 
     # -- domain --------------------------------------------------------------
     INSTANCE_CHUNK_TOO_LARGE = "INSTANCE_CHUNK_TOO_LARGE"

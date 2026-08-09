@@ -72,6 +72,12 @@ class ConflictError(ApiError):
     message = "Resource conflict"
 
 
+class IngestInProgressError(ConflictError):
+    code = ErrorCode.INGEST_IN_PROGRESS
+    status_code = 409
+    message = "An ingest job is already in progress for this study"
+
+
 class AuditStoreNotImmutableError(ApiError):
     code = ErrorCode.AUDIT_STORE_NOT_IMMUTABLE
     status_code = 503

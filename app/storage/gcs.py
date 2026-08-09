@@ -93,6 +93,25 @@ class GcsObjectStore:
         self._bucket.copy_blob(self._bucket.blob(src_key), self._bucket, dst_key)
         return ObjectRef(bucket=self._bucket_name, key=dst_key)
 
+    def _rewrite_sync(
+        self,
+        src_key: str,
+        dst_key: str,
+        cache_control: str | None,
+        metadata: Mapping[str, str] | None,
+    ) -> ObjectRef:
+        # Server-side copy (no bytes through the app), then patch the
+        # destination's Cache-Control / custom metadata.
+        self._bucket.copy_blob(self._bucket.blob(src_key), self._bucket, dst_key)
+        dest = self._bucket.blob(dst_key)
+        if cache_control is not None:
+            dest.cache_control = cache_control
+        if metadata is not None:
+            dest.metadata = dict(metadata)
+        if cache_control is not None or metadata is not None:
+            dest.patch()
+        return ObjectRef(bucket=self._bucket_name, key=dst_key)
+
     def _object_metadata_sync(self, key: str) -> ObjectMetadata:
         blob = self._bucket.blob(key)
         blob.reload()
@@ -103,6 +122,7 @@ class GcsObjectStore:
             etag=blob.etag or "",
             updated=blob.updated or datetime.now(UTC),
             metadata=dict(blob.metadata) if blob.metadata else {},
+            cache_control=blob.cache_control or None,
         )
 
     def _signed_read_url_sync(
@@ -157,9 +177,12 @@ class GcsObjectStore:
         expected_bytes: int,
     ) -> str:
         blob = self._bucket.blob(key)
+        # size=None lets the client stream an object whose length is not known
+        # up front (the per-object size is not declared at session-mint time).
+        size: int | None = expected_bytes if expected_bytes > 0 else None
         return cast(
             str,
-            blob.create_resumable_upload_session(content_type=content_type, size=expected_bytes),
+            blob.create_resumable_upload_session(content_type=content_type, size=size),
         )
 
     def _supports_bucket_lock_sync(self) -> bool:
@@ -201,6 +224,18 @@ class GcsObjectStore:
 
     async def copy(self, src_key: str, dst_key: str) -> ObjectRef:
         return await asyncio.to_thread(self._copy_sync, src_key, dst_key)
+
+    async def rewrite(
+        self,
+        src_key: str,
+        dst_key: str,
+        *,
+        cache_control: str | None = None,
+        metadata: Mapping[str, str] | None = None,
+    ) -> ObjectRef:
+        return await asyncio.to_thread(
+            self._rewrite_sync, src_key, dst_key, cache_control, metadata
+        )
 
     async def object_metadata(self, key: str) -> ObjectMetadata:
         return await asyncio.to_thread(self._object_metadata_sync, key)
