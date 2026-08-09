@@ -36,24 +36,15 @@ def test_legal_transitions_table_is_exactly_two_edges() -> None:
 
 
 @pytest.mark.parametrize("current,target", sorted(_LEGAL))
-def test_legal_transitions_pass(
-    current: ReportStatus, target: ReportStatus
-) -> None:
+def test_legal_transitions_pass(current: ReportStatus, target: ReportStatus) -> None:
     validate_report_transition(current, target)  # must not raise
 
 
 @pytest.mark.parametrize(
     "current,target",
-    [
-        (c, t)
-        for c in _STATUSES
-        for t in _STATUSES
-        if (c, t) not in _LEGAL
-    ],
+    [(c, t) for c in _STATUSES for t in _STATUSES if (c, t) not in _LEGAL],
 )
-def test_illegal_transitions_raise_409(
-    current: ReportStatus, target: ReportStatus
-) -> None:
+def test_illegal_transitions_raise_409(current: ReportStatus, target: ReportStatus) -> None:
     with pytest.raises(InvalidReportTransitionError) as exc_info:
         validate_report_transition(current, target)
     assert exc_info.value.status_code == 409

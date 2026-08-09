@@ -223,9 +223,7 @@ class TestCreateDraft:
         assert resp.status_code == 403
         assert resp.json()["error"]["code"] == "PHI_ACCESS_FORBIDDEN"
 
-    def test_viewer_denied(
-        self, client: TestClient, doc_store: InMemoryDocumentStore
-    ) -> None:
+    def test_viewer_denied(self, client: TestClient, doc_store: InMemoryDocumentStore) -> None:
         client.app.state.token_verifier = FakeTokenVerifier(
             default_user=make_user(role=Role.VIEWER, mfa_state=SecondFactorState.VERIFIED)
         )
@@ -297,9 +295,7 @@ class TestUpdateDraft:
 # Sign + idempotency
 # ---------------------------------------------------------------------------
 class TestSign:
-    def test_sign_succeeds(
-        self, client: TestClient, doc_store: InMemoryDocumentStore
-    ) -> None:
+    def test_sign_succeeds(self, client: TestClient, doc_store: InMemoryDocumentStore) -> None:
         report_id = _prep_for_signing(client, doc_store)
         resp = _sign_report(client, report_id)
         assert resp.status_code == 200
@@ -447,9 +443,7 @@ class TestAddendum:
 # Version history
 # ---------------------------------------------------------------------------
 class TestVersions:
-    def test_versions_ascending(
-        self, client: TestClient, doc_store: InMemoryDocumentStore
-    ) -> None:
+    def test_versions_ascending(self, client: TestClient, doc_store: InMemoryDocumentStore) -> None:
         report_id = _prep_for_signing(client, doc_store)
         _sign_report(client, report_id)
         resp = client.get(f"/api/v1/reports/{report_id}/versions", headers=_auth())
@@ -595,9 +589,7 @@ class TestTransactionRollback:
         assert report_doc["status"] == "PENDING_SIGNATURE"
         assert report_doc.get("signature") is None
         # No version 2 should exist — list versions via the API.
-        versions_resp = client.get(
-            f"/api/v1/reports/{report_id}/versions", headers=_auth()
-        )
+        versions_resp = client.get(f"/api/v1/reports/{report_id}/versions", headers=_auth())
         assert versions_resp.status_code == 200
         version_numbers = sorted(v["version"] for v in versions_resp.json())
         assert version_numbers == [1]

@@ -36,8 +36,10 @@ def _hmac_imports(tree: ast.AST) -> list[str]:
             for alias in node.names:
                 if alias.name == "hmac" or alias.name.startswith("hmac."):
                     hits.append(f"import {alias.name}")
-        elif isinstance(node, ast.ImportFrom) and node.module and (
-            node.module == "hmac" or node.module.startswith("hmac.")
+        elif (
+            isinstance(node, ast.ImportFrom)
+            and node.module
+            and (node.module == "hmac" or node.module.startswith("hmac."))
         ):
             hits.append(f"from {node.module} import ...")
     return hits

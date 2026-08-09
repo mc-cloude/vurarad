@@ -84,9 +84,7 @@ class ReportRepo:
 
     async def update(self, draft: ReportDraft) -> ReportDraft:
         """Overwrite a report document with the updated draft."""
-        await self._store.set(
-            REPORTS_COLLECTION, draft.report_id, draft.model_dump(by_alias=True)
-        )
+        await self._store.set(REPORTS_COLLECTION, draft.report_id, draft.model_dump(by_alias=True))
         return draft
 
     # -- the transactional sign ----------------------------------------------
