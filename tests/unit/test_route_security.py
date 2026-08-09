@@ -194,11 +194,23 @@ def test_no_route_path_contains_direct_identifier_param() -> None:
 # /api/v1/studies/* route security (WP4 — §3.3–3.6 acceptance criteria 11–15)
 # ---------------------------------------------------------------------------
 def _studies_routes(app: FastAPI) -> list[tuple[str, str, APIRoute]]:
-    """Filter to /api/v1/studies routes only (excluding WP12 sub-resources)."""
+    """Filter to /api/v1/studies routes only (excluding WP12 + AI sub-resources)."""
     return [
         (m, p, r)
         for m, p, r in _collect_api_routes(app)
-        if p.startswith("/api/v1/studies") and "/findings" not in p and "/preprocessing" not in p
+        if p.startswith("/api/v1/studies")
+        and "/findings" not in p
+        and "/preprocessing" not in p
+        and "/ai/" not in p
+    ]
+
+
+def _ai_routes(app: FastAPI) -> list[tuple[str, str, APIRoute]]:
+    """Filter to the /api/v1/studies/{id}/ai/* routes (WP6)."""
+    return [
+        (m, p, r)
+        for m, p, r in _collect_api_routes(app)
+        if p.startswith("/api/v1/studies") and "/ai/" in p
     ]
 
 
@@ -236,4 +248,44 @@ def test_studies_routes_have_phi_capability_check() -> None:
         names = _dep_names(route)
         assert "_require" in names or "require_patient_identity_access" in names, (
             f"Route {method} {path} missing PHI capability check"
+        )
+
+
+# ---------------------------------------------------------------------------:
+# /api/v1/studies/{studyId}/ai/* route security (WP6 — AI streaming)
+# ---------------------------------------------------------------------------:
+def test_ai_route_count_is_two() -> None:
+    """The AI package exposes exactly two routes (report-draft + qa)."""
+    app = create_app()
+    routes = _ai_routes(app)
+    assert len(routes) == 2, f"Expected 2 AI routes, got {len(routes)}"
+    paths = {p for _m, p, _r in routes}
+    assert "/api/v1/studies/{study_id}/ai/report-draft" in paths
+    assert "/api/v1/studies/{study_id}/ai/qa" in paths
+
+
+def test_ai_routes_require_auth_and_mfa() -> None:
+    """Every AI route must carry get_current_user and require_mfa."""
+    app = create_app()
+    for method, path, route in _ai_routes(app):
+        names = _dep_names(route)
+        assert "get_current_user" in names, f"Route {method} {path} missing get_current_user"
+        assert "require_mfa" in names, f"Route {method} {path} missing require_mfa"
+
+
+def test_ai_routes_have_phi_capability_check() -> None:
+    """Every AI route must carry a PHI capability check (admin → 403 PHI_ACCESS_FORBIDDEN)."""
+    app = create_app()
+    for method, path, route in _ai_routes(app):
+        names = _dep_names(route)
+        assert "_require" in names, f"Route {method} {path} missing PHI capability check"
+        caps = _require_capability_calls(route)
+        assert len(caps) == 1, (
+            f"Route {method} {path} declares {len(caps)} capabilities, expected 1"
+        )
+        cap = _extract_capability(caps[0])
+        from app.core.capabilities import Capability
+
+        assert cap in (Capability.AI_DRAFT, Capability.AI_FULL), (
+            f"Route {method} {path} has capability {cap}, expected ai:draft or ai:full"
         )

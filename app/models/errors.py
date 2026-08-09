@@ -40,6 +40,8 @@ class ErrorCode(StrEnum):
     AI_UNAVAILABLE = "AI_UNAVAILABLE"
     AI_BUDGET_EXCEEDED = "AI_BUDGET_EXCEEDED"
     AI_DISABLED = "AI_DISABLED"
+    AI_UPSTREAM_TIMEOUT = "AI_UPSTREAM_TIMEOUT"
+    AI_RATE_LIMITED = "AI_RATE_LIMITED"
 
     # -- de-identification ---------------------------------------------------
     DEID_PIXEL_PASS_FAILED = "DEID_PIXEL_PASS_FAILED"

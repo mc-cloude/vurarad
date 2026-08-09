@@ -108,6 +108,7 @@ ROLE_CAPABILITIES: dict[Role, frozenset[Capability]] = {
             Capability.REPORT_ADDENDUM,
             Capability.IMAGING_ACCESS,
             Capability.AI_DRAFT,
+            Capability.AI_FULL,
             Capability.BREAK_GLASS,
             Capability.RESEARCH_COHORT_CREATE,
             Capability.RESEARCH_FEATURES_READ,

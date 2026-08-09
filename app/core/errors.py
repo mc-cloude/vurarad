@@ -137,6 +137,50 @@ class AuditStoreNotImmutableError(ApiError):
     message = "Audit store does not enforce bucket lock (WORM)"
 
 
+# -- AI errors --------------------------------------------------------------
+class AiUpstreamTimeoutError(ApiError):
+    """The Gemini/Vertex AI upstream did not respond within the SDK timeout.
+
+    Delivered to the client as an SSE ``error`` frame carrying
+    ``AI_UPSTREAM_TIMEOUT`` so a mid-stream abort surfaces a deterministic
+    code rather than a generic 500.
+    """
+
+    code = ErrorCode.AI_UPSTREAM_TIMEOUT
+    status_code = 502
+    message = "AI upstream request timed out"
+
+
+class AiRateLimitedError(ApiError):
+    """Per-user AI rate limit exceeded (§3.0.3 ``ai`` bucket).
+
+    Returns ``429`` with a ``Retry-After`` header.  Distinct from
+    :class:`AiBudgetExceeded` (a monthly spend ceiling) — this is a
+    short-window per-user throttle.
+    """
+
+    code = ErrorCode.AI_RATE_LIMITED
+    status_code = 429
+    message = "AI request rate limit exceeded"
+
+    def __init__(self, retry_after: float, message: str | None = None) -> None:
+        self.retry_after = retry_after
+        super().__init__(message or self.message)
+
+
+class AiBudgetExceededError(ApiError):
+    """Tenant monthly AI spend ceiling reached (D15).
+
+    Checked **before** any SDK call (acceptance criterion 12) and delivered
+    to the client as an SSE ``error`` frame so the stream shape is always
+    ``meta → error``.
+    """
+
+    code = ErrorCode.AI_BUDGET_EXCEEDED
+    status_code = 429
+    message = "AI monthly budget exceeded"
+
+
 # -- envelope ----------------------------------------------------------------
 def _make_error_body(
     code: ErrorCode,
