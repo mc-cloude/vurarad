@@ -317,9 +317,7 @@ class ReportSyncService:
         return await self._sync_repo.erase_for_study(study_id)
 
     # -- conflict resolution -------------------------------------------------
-    def _apply_set_section(
-        self, report: Report, mut: SyncMutation, user_uid: str
-    ) -> _SetOutcome:
+    def _apply_set_section(self, report: Report, mut: SyncMutation, user_uid: str) -> _SetOutcome:
         """Apply one SET_SECTION mutation; return the outcome.
 
         - section absent or last modified at/below ``baseVersion`` → apply.
@@ -381,9 +379,7 @@ class ReportSyncService:
         return _SetOutcome(changed=True)
 
     @staticmethod
-    def _apply_append_dictation(
-        report: Report, mut: SyncMutation, user_uid: str
-    ) -> None:
+    def _apply_append_dictation(report: Report, mut: SyncMutation, user_uid: str) -> None:
         """Append one dictation segment and re-order by ``at`` (criterion 7)."""
         report.dictation_segments.append(
             DictationSyncSegment(

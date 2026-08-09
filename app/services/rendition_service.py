@@ -283,9 +283,7 @@ class RenditionService:
             thumb_key = self.derived_key(
                 study_id, series_id, inst.sop_instance_uid, Quality.THUMBNAIL
             )
-            prev_key = self.derived_key(
-                study_id, series_id, inst.sop_instance_uid, Quality.PREVIEW
-            )
+            prev_key = self.derived_key(study_id, series_id, inst.sop_instance_uid, Quality.PREVIEW)
             entries.append(
                 ManifestEntry(
                     sop_instance_uid=inst.sop_instance_uid,
