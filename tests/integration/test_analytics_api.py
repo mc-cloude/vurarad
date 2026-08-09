@@ -41,11 +41,7 @@ class RecordingCounterStore:
         return self.counters.get(counter_name, 0)
 
     async def read_prefix(self, prefix: str) -> dict[str, int]:
-        return {
-            name: value
-            for name, value in self.counters.items()
-            if name.startswith(prefix)
-        }
+        return {name: value for name, value in self.counters.items() if name.startswith(prefix)}
 
 
 class StubTokenVerifier:
@@ -218,9 +214,7 @@ class TestAnalyticsDenials:
 # 4. MFA enforcement
 # ---------------------------------------------------------------------------
 class TestAnalyticsMfa:
-    def test_first_factor_only_admin_gets_mfa_required(
-        self, analytics_app: FastAPI
-    ) -> None:
+    def test_first_factor_only_admin_gets_mfa_required(self, analytics_app: FastAPI) -> None:
         verifier = analytics_app.state.token_verifier
         assert isinstance(verifier, StubTokenVerifier)
         verifier.users["enrolled-only"] = make_user(

@@ -99,9 +99,7 @@ class AuditExportService:
 
         window = filters.to - filters.from_
         if window < 0 or window > MAX_AUDIT_WINDOW_SECONDS:
-            raise AuditWindowTooWideError(
-                "Audit export window must be between 0 and 92 days"
-            )
+            raise AuditWindowTooWideError("Audit export window must be between 0 and 92 days")
 
         events = await self._collect_events(filters)
         ndjson = self._to_ndjson(events)
@@ -109,9 +107,7 @@ class AuditExportService:
         export_id = f"ax_{ULID()}"
         key = f"{EXPORT_KEY_PREFIX}{export_id}.ndjson"
 
-        await self._export_store.put(
-            key, ndjson, content_type=EXPORT_CONTENT_TYPE
-        )
+        await self._export_store.put(key, ndjson, content_type=EXPORT_CONTENT_TYPE)
         signed_url = await self._export_store.generate_signed_read_url(
             key, ttl_seconds=EXPORT_URL_TTL_SECONDS
         )

@@ -37,9 +37,7 @@ class RecordingPixelStore:
 
     async def list_prefix(self, prefix: str, limit: int = 1000) -> list[ObjectRef]:
         return [
-            ObjectRef(bucket="pix", key=key)
-            for key in self._objects
-            if key.startswith(prefix)
+            ObjectRef(bucket="pix", key=key) for key in self._objects if key.startswith(prefix)
         ][:limit]
 
     async def delete(self, key: str) -> None:
@@ -233,8 +231,10 @@ class TestErasureCompleteness:
         self, client: TestClient, doc_store: InMemoryDocumentStore
     ) -> None:
         client.request(
-            "DELETE", "/api/v1/admin/patients/pk-1",
-            json={"confirmPatientRef": "PT-CONFIRM"}, headers=_auth(),
+            "DELETE",
+            "/api/v1/admin/patients/pk-1",
+            json={"confirmPatientRef": "PT-CONFIRM"},
+            headers=_auth(),
         )
         import asyncio
 
@@ -246,8 +246,10 @@ class TestErasureCompleteness:
         import asyncio
 
         client.request(
-            "DELETE", "/api/v1/admin/patients/pk-1",
-            json={"confirmPatientRef": "PT-CONFIRM"}, headers=_auth(),
+            "DELETE",
+            "/api/v1/admin/patients/pk-1",
+            json={"confirmPatientRef": "PT-CONFIRM"},
+            headers=_auth(),
         )
         assert asyncio.run(doc_store.get("studies", "st-1")) is None
         assert asyncio.run(doc_store.get("studies", "st-2")) is None
@@ -262,8 +264,10 @@ class TestErasureCompleteness:
         import asyncio
 
         client.request(
-            "DELETE", "/api/v1/admin/patients/pk-1",
-            json={"confirmPatientRef": "PT-CONFIRM"}, headers=_auth(),
+            "DELETE",
+            "/api/v1/admin/patients/pk-1",
+            json={"confirmPatientRef": "PT-CONFIRM"},
+            headers=_auth(),
         )
         assert asyncio.run(doc_store.get("reports", "r-1")) is None
         assert asyncio.run(doc_store.get("reports", "r-2")) is None
@@ -273,8 +277,10 @@ class TestErasureCompleteness:
         self, client: TestClient, pixel_store: RecordingPixelStore
     ) -> None:
         client.request(
-            "DELETE", "/api/v1/admin/patients/pk-1",
-            json={"confirmPatientRef": "PT-CONFIRM"}, headers=_auth(),
+            "DELETE",
+            "/api/v1/admin/patients/pk-1",
+            json={"confirmPatientRef": "PT-CONFIRM"},
+            headers=_auth(),
         )
         deleted = set(pixel_store.deleted_keys)
         assert "studies/st-1/se-1/0000.dcm" in deleted
@@ -289,8 +295,10 @@ class TestErasureCompleteness:
         import asyncio
 
         client.request(
-            "DELETE", "/api/v1/admin/patients/pk-1",
-            json={"confirmPatientRef": "PT-CONFIRM"}, headers=_auth(),
+            "DELETE",
+            "/api/v1/admin/patients/pk-1",
+            json={"confirmPatientRef": "PT-CONFIRM"},
+            headers=_auth(),
         )
         wl = asyncio.run(doc_store.get("worklist_index", "current"))
         assert wl is not None
@@ -309,8 +317,10 @@ class TestErasureAudit:
     ) -> None:
         before = len(audit_mirror._events)
         client.request(
-            "DELETE", "/api/v1/admin/patients/pk-1",
-            json={"confirmPatientRef": "PT-CONFIRM"}, headers=_auth(),
+            "DELETE",
+            "/api/v1/admin/patients/pk-1",
+            json={"confirmPatientRef": "PT-CONFIRM"},
+            headers=_auth(),
         )
         after = len(audit_mirror._events)
         # Pre-existing records retained (none deleted) + one PATIENT_ERASED added.
@@ -333,8 +343,10 @@ class TestErasureConfirmation:
         import asyncio
 
         r = client.request(
-            "DELETE", "/api/v1/admin/patients/pk-2",
-            json={"confirmPatientRef": "WRONG"}, headers=_auth(),
+            "DELETE",
+            "/api/v1/admin/patients/pk-2",
+            json={"confirmPatientRef": "WRONG"},
+            headers=_auth(),
         )
         assert r.status_code == 422
         assert r.json()["error"]["code"] == "ERASURE_CONFIRMATION_MISMATCH"
@@ -348,8 +360,10 @@ class TestErasureConfirmation:
 class TestErasureNotFound:
     def test_unknown_patient_returns_404(self, client: TestClient) -> None:
         r = client.request(
-            "DELETE", "/api/v1/admin/patients/pk-nonexistent",
-            json={"confirmPatientRef": "x"}, headers=_auth(),
+            "DELETE",
+            "/api/v1/admin/patients/pk-nonexistent",
+            json={"confirmPatientRef": "x"},
+            headers=_auth(),
         )
         assert r.status_code == 404
         assert r.json()["error"]["code"] == "PATIENT_NOT_FOUND"
@@ -361,13 +375,17 @@ class TestErasureNotFound:
 class TestErasureIdempotency:
     def test_second_call_returns_zero_counts(self, client: TestClient) -> None:
         r1 = client.request(
-            "DELETE", "/api/v1/admin/patients/pk-1",
-            json={"confirmPatientRef": "PT-CONFIRM"}, headers=_auth(),
+            "DELETE",
+            "/api/v1/admin/patients/pk-1",
+            json={"confirmPatientRef": "PT-CONFIRM"},
+            headers=_auth(),
         )
         assert r1.status_code == 200
         r2 = client.request(
-            "DELETE", "/api/v1/admin/patients/pk-1",
-            json={"confirmPatientRef": "PT-CONFIRM"}, headers=_auth(),
+            "DELETE",
+            "/api/v1/admin/patients/pk-1",
+            json={"confirmPatientRef": "PT-CONFIRM"},
+            headers=_auth(),
         )
         assert r2.status_code == 200
         assert all(count == 0 for count in r2.json()["deleted"].values())
@@ -379,7 +397,8 @@ class TestErasureIdempotency:
 class TestErasureFreshMfa:
     def test_missing_mfa_code_returns_403(self, client: TestClient) -> None:
         r = client.request(
-            "DELETE", "/api/v1/admin/patients/pk-1",
+            "DELETE",
+            "/api/v1/admin/patients/pk-1",
             json={"confirmPatientRef": "PT-CONFIRM"},
             headers={"Authorization": "Bearer admin-token"},
         )
@@ -388,7 +407,8 @@ class TestErasureFreshMfa:
 
     def test_invalid_mfa_code_returns_403(self, client: TestClient) -> None:
         r = client.request(
-            "DELETE", "/api/v1/admin/patients/pk-1",
+            "DELETE",
+            "/api/v1/admin/patients/pk-1",
             json={"confirmPatientRef": "PT-CONFIRM"},
             headers={"Authorization": "Bearer admin-token", "X-MFA-Code": "bad"},
         )
@@ -402,7 +422,8 @@ class TestErasureFreshMfa:
 class TestErasureDenial:
     def test_radiologist_forbidden(self, client: TestClient) -> None:
         r = client.request(
-            "DELETE", "/api/v1/admin/patients/pk-1",
+            "DELETE",
+            "/api/v1/admin/patients/pk-1",
             json={"confirmPatientRef": "PT-CONFIRM"},
             headers={"Authorization": "Bearer rad-token", "X-MFA-Code": "123456"},
         )
@@ -426,8 +447,10 @@ class TestErasureNoMrnInRequestLine:
 
     def test_request_line_never_contains_mrn(self, client: TestClient) -> None:
         r = client.request(
-            "DELETE", "/api/v1/admin/patients/pk-1",
-            json={"confirmPatientRef": "PT-CONFIRM"}, headers=_auth(),
+            "DELETE",
+            "/api/v1/admin/patients/pk-1",
+            json={"confirmPatientRef": "PT-CONFIRM"},
+            headers=_auth(),
         )
         assert r.status_code == 200
         request_line = f"{r.request.method} {r.request.url.path}"

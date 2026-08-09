@@ -71,18 +71,14 @@ class FakeAuditStore:
             return event.detail.get("studyId") == filters.study_id
         return True
 
-    async def query_events(
-        self, filters: AuditFilter
-    ) -> tuple[list[AuditEvent], str | None]:
+    async def query_events(self, filters: AuditFilter) -> tuple[list[AuditEvent], str | None]:
         events = sorted(
             (e for e in self.mirror if self._matches(e, filters)),
             key=lambda e: e.seq,
         )
         offset = int(filters.page_token) if filters.page_token else 0
         page = events[offset : offset + filters.limit]
-        next_token = (
-            str(offset + len(page)) if offset + len(page) < len(events) else None
-        )
+        next_token = str(offset + len(page)) if offset + len(page) < len(events) else None
         return page, next_token
 
     async def count_events(self, filters: AuditFilter) -> int:
@@ -155,14 +151,34 @@ class StubTokenVerifier:
 # ---------------------------------------------------------------------------
 def _specs() -> list[dict[str, Any]]:
     return [
-        {"type": "STUDY_ACCESSED", "actor": "rad-1", "ts": T0, "patient_key": "pk-a",
-         "detail": {"studyId": "st-1"}},
-        {"type": "REPORT_SIGNED", "actor": "rad-1", "ts": T0 + 50, "patient_key": "pk-a",
-         "detail": {"studyId": "st-1", "resource": "report/r1"}},
-        {"type": "STUDY_ACCESSED", "actor": "rad-2", "ts": T0 + 100, "patient_key": "pk-b",
-         "detail": {"studyId": "st-2"}},
-        {"type": "REPORT_SIGNED", "actor": "rad-2", "ts": T0 + 150, "patient_key": "pk-b",
-         "detail": {"studyId": "st-2"}},
+        {
+            "type": "STUDY_ACCESSED",
+            "actor": "rad-1",
+            "ts": T0,
+            "patient_key": "pk-a",
+            "detail": {"studyId": "st-1"},
+        },
+        {
+            "type": "REPORT_SIGNED",
+            "actor": "rad-1",
+            "ts": T0 + 50,
+            "patient_key": "pk-a",
+            "detail": {"studyId": "st-1", "resource": "report/r1"},
+        },
+        {
+            "type": "STUDY_ACCESSED",
+            "actor": "rad-2",
+            "ts": T0 + 100,
+            "patient_key": "pk-b",
+            "detail": {"studyId": "st-2"},
+        },
+        {
+            "type": "REPORT_SIGNED",
+            "actor": "rad-2",
+            "ts": T0 + 150,
+            "patient_key": "pk-b",
+            "detail": {"studyId": "st-2"},
+        },
     ]
 
 
@@ -221,9 +237,7 @@ class TestAuditQuery:
         assert r.status_code == 422
 
     def test_window_too_wide_returns_422(self, client: TestClient) -> None:
-        r = client.get(
-            f"/api/v1/audit?from={T0}&to={T0 + 93 * 86400}", headers=_auth()
-        )
+        r = client.get(f"/api/v1/audit?from={T0}&to={T0 + 93 * 86400}", headers=_auth())
         assert r.status_code == 422
         assert r.json()["error"]["code"] == "AUDIT_WINDOW_TOO_WIDE"
 
@@ -238,9 +252,7 @@ class TestAuditQuery:
         assert actions == {"STUDY_ACCESSED", "REPORT_SIGNED"}
 
     def test_actor_filter_narrows_results(self, client: TestClient) -> None:
-        r = client.get(
-            f"/api/v1/audit?from={T0}&to={T0 + 200}&actor=rad-2", headers=_auth()
-        )
+        r = client.get(f"/api/v1/audit?from={T0}&to={T0 + 200}&actor=rad-2", headers=_auth())
         assert r.status_code == 200
         body = r.json()
         assert body["totalCount"] == 2
@@ -257,18 +269,14 @@ class TestAuditQuery:
         assert all(e["action"] == "REPORT_SIGNED" for e in body["entries"])
 
     def test_patient_key_filter_narrows_results(self, client: TestClient) -> None:
-        r = client.get(
-            f"/api/v1/audit?from={T0}&to={T0 + 200}&patientKey=pk-b", headers=_auth()
-        )
+        r = client.get(f"/api/v1/audit?from={T0}&to={T0 + 200}&patientKey=pk-b", headers=_auth())
         assert r.status_code == 200
         body = r.json()
         assert body["totalCount"] == 2
         assert all(e["patientKey"] == "pk-b" for e in body["entries"])
 
     def test_pagination_returns_next_token(self, client: TestClient) -> None:
-        r = client.get(
-            f"/api/v1/audit?from={T0}&to={T0 + 200}&limit=2", headers=_auth()
-        )
+        r = client.get(f"/api/v1/audit?from={T0}&to={T0 + 200}&limit=2", headers=_auth())
         assert r.status_code == 200
         body = r.json()
         assert len(body["entries"]) == 2
@@ -278,9 +286,7 @@ class TestAuditQuery:
         self, client: TestClient, audit_store: FakeAuditStore
     ) -> None:
         before = sum(1 for e in audit_store.mirror if e.event_type == "AUDIT_VIEWED")
-        r = client.get(
-            f"/api/v1/audit?from={T0}&to={T0 + 200}&actor=rad-1", headers=_auth()
-        )
+        r = client.get(f"/api/v1/audit?from={T0}&to={T0 + 200}&actor=rad-1", headers=_auth())
         assert r.status_code == 200
         after = sum(1 for e in audit_store.mirror if e.event_type == "AUDIT_VIEWED")
         assert after == before + 1

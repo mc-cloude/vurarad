@@ -33,9 +33,7 @@ class FakeUserDirectory:
         self.revoke_calls: list[str] = []
         self.claims_updates: list[tuple[str, dict[str, Any]]] = []
 
-    async def list_users(
-        self, *, page_token: str | None, max_results: int
-    ) -> UserListPage:
+    async def list_users(self, *, page_token: str | None, max_results: int) -> UserListPage:
         users = list(self._users.values())
         return UserListPage(users=users, next_page_token=None)
 

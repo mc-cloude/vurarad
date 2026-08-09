@@ -182,9 +182,7 @@ async def list_users(
     page_token: str | None = Query(default=None, alias="pageToken"),
     max_results: int = Query(default=100, ge=1, le=1000, alias="maxResults"),
 ) -> UserListResponse:
-    return await admin_service.list_users(
-        page_token=page_token, max_results=max_results
-    )
+    return await admin_service.list_users(page_token=page_token, max_results=max_results)
 
 
 # ---------------------------------------------------------------------------

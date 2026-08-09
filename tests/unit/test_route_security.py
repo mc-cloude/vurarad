@@ -251,9 +251,7 @@ def _audit_routes(app: FastAPI) -> list[tuple[str, str, APIRoute]]:
 
 
 def _analytics_routes(app: FastAPI) -> list[tuple[str, str, APIRoute]]:
-    return [
-        (m, p, r) for m, p, r in _collect_api_routes(app) if p.startswith("/api/v1/analytics")
-    ]
+    return [(m, p, r) for m, p, r in _collect_api_routes(app) if p.startswith("/api/v1/analytics")]
 
 
 def test_admin_route_count_is_four() -> None:

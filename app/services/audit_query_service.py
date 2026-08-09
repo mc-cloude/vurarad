@@ -32,9 +32,7 @@ AUDIT_CHAIN_COLLECTION = "audit_chain"
 class AuditReadStore(Protocol):
     """Backend for audit reads + chain verification."""
 
-    async def query_events(
-        self, filters: AuditFilter
-    ) -> tuple[list[AuditEvent], str | None]: ...
+    async def query_events(self, filters: AuditFilter) -> tuple[list[AuditEvent], str | None]: ...
 
     async def count_events(self, filters: AuditFilter) -> int: ...
 
@@ -99,24 +97,16 @@ class FirestoreAuditReadStore:
             where.append(("event_type", "==", filters.action))
         if filters.patient_key is not None:
             where.append(("patient_key", "==", filters.patient_key))
-        rows = await self._store.query(
-            collection, where=where or None, limit=5000
-        )
+        rows = await self._store.query(collection, where=where or None, limit=5000)
         events = [_event_from_doc(doc) for _doc_id, doc in rows]
         return [e for e in events if _matches(e, filters)]
 
-    async def query_events(
-        self, filters: AuditFilter
-    ) -> tuple[list[AuditEvent], str | None]:
+    async def query_events(self, filters: AuditFilter) -> tuple[list[AuditEvent], str | None]:
         events = await self._fetch(AUDIT_MIRROR_COLLECTION, filters)
         events.sort(key=lambda e: e.seq)
         offset = int(filters.page_token) if filters.page_token else 0
         page = events[offset : offset + filters.limit]
-        next_token = (
-            str(offset + len(page))
-            if offset + len(page) < len(events)
-            else None
-        )
+        next_token = str(offset + len(page)) if offset + len(page) < len(events) else None
         return page, next_token
 
     async def count_events(self, filters: AuditFilter) -> int:
@@ -197,9 +187,7 @@ class AuditQueryService:
             raise SearchFilterRequiredError("Audit query requires from and to bounds")
         window = filters.to - filters.from_
         if window < 0 or window > MAX_AUDIT_WINDOW_SECONDS:
-            raise AuditWindowTooWideError(
-                "Audit query window must be between 0 and 92 days"
-            )
+            raise AuditWindowTooWideError("Audit query window must be between 0 and 92 days")
 
         events, next_token = await self._read_store.query_events(filters)
         total = await self._read_store.count_events(filters)

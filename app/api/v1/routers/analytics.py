@@ -44,11 +44,7 @@ class InMemoryCounterStore:
         return self._counters.get(counter_name, 0)
 
     async def read_prefix(self, prefix: str) -> dict[str, int]:
-        return {
-            name: value
-            for name, value in self._counters.items()
-            if name.startswith(prefix)
-        }
+        return {name: value for name, value in self._counters.items() if name.startswith(prefix)}
 
 
 async def get_analytics_counter_store(request: Request) -> AnalyticsCounterStore:

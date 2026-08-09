@@ -142,11 +142,7 @@ class FakeCounterStore:
         return self.counters.get(counter_name, 0)
 
     async def read_prefix(self, prefix: str) -> dict[str, int]:
-        return {
-            name: value
-            for name, value in self.counters.items()
-            if name.startswith(prefix)
-        }
+        return {name: value for name, value in self.counters.items() if name.startswith(prefix)}
 
 
 async def test_analytics_counters() -> None:

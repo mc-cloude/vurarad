@@ -53,9 +53,7 @@ class UserListPage:
 class UserDirectory(Protocol):
     """Backend-agnostic Identity Platform directory."""
 
-    async def list_users(
-        self, *, page_token: str | None, max_results: int
-    ) -> UserListPage: ...
+    async def list_users(self, *, page_token: str | None, max_results: int) -> UserListPage: ...
 
     async def get_user(self, uid: str) -> RawUserRecord | None: ...
 
@@ -88,14 +86,10 @@ class FirebaseUserDirectory:
             mfa_enrolled=bool(claims.get("mfaEnrolled", False)),
         )
 
-    def _list_users_sync(
-        self, page_token: str | None, max_results: int
-    ) -> UserListPage:
+    def _list_users_sync(self, page_token: str | None, max_results: int) -> UserListPage:
         from firebase_admin import auth
 
-        page = auth.list_users(
-            page_token=page_token, max_results=max_results, app=self._app
-        )
+        page = auth.list_users(page_token=page_token, max_results=max_results, app=self._app)
         users = [self._to_raw(ur) for ur in page.users]
         next_token = page.next_page_token if page.has_next_page else None
         return UserListPage(users=users, next_page_token=next_token)
@@ -125,9 +119,7 @@ class FirebaseUserDirectory:
 
         auth.update_user(uid, disabled=disabled, app=self._app)
 
-    async def list_users(
-        self, *, page_token: str | None, max_results: int
-    ) -> UserListPage:
+    async def list_users(self, *, page_token: str | None, max_results: int) -> UserListPage:
         return await asyncio.to_thread(self._list_users_sync, page_token, max_results)
 
     async def get_user(self, uid: str) -> RawUserRecord | None:
@@ -172,9 +164,7 @@ class AdminService:
     async def list_users(
         self, *, page_token: str | None = None, max_results: int = 100
     ) -> UserListResponse:
-        page = await self._directory.list_users(
-            page_token=page_token, max_results=max_results
-        )
+        page = await self._directory.list_users(page_token=page_token, max_results=max_results)
         return UserListResponse(
             users=[_to_admin_user(u) for u in page.users],
             next_page_token=page.next_page_token,
