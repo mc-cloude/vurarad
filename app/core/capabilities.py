@@ -58,7 +58,6 @@ PHI_CAPABILITIES: frozenset[Capability] = frozenset(
         Capability.IMAGING_ACCESS,
         Capability.AI_DRAFT,
         Capability.AI_FULL,
-        Capability.COMPLIANCE_PURGE,
         Capability.BREAK_GLASS,
         Capability.RESEARCH_COHORT_CREATE,
         Capability.RESEARCH_FEATURES_READ,
@@ -86,6 +85,7 @@ ROLE_CAPABILITIES: dict[Role, frozenset[Capability]] = {
             Capability.AUDIT_EXPORT,
             Capability.ANALYTICS_READ,
             Capability.USER_MANAGE,
+            Capability.COMPLIANCE_PURGE,
         }
     ),
     Role.VIEWER: frozenset(

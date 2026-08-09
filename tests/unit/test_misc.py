@@ -141,6 +141,13 @@ class FakeCounterStore:
     async def read(self, counter_name: str) -> int:
         return self.counters.get(counter_name, 0)
 
+    async def read_prefix(self, prefix: str) -> dict[str, int]:
+        return {
+            name: value
+            for name, value in self.counters.items()
+            if name.startswith(prefix)
+        }
+
 
 async def test_analytics_counters() -> None:
     service = AnalyticsService(FakeCounterStore())
@@ -212,14 +219,20 @@ def test_auth_no_os_getenv_reachable_from_get_current_user() -> None:
 def test_auth_me_returns_role_capabilities_for_admin(
     fake_verifier: FakeTokenVerifier, client: TestClient
 ) -> None:
-    """Admin capabilities must be the administrative set (no PHI)."""
+    """Admin capabilities must be the administrative set (no PHI-read)."""
     fake_verifier.users[VALID_TOKEN] = make_user(
         uid="admin-1", email="admin@example.com", role=Role.ADMIN
     )
     r = client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {VALID_TOKEN}"})
     assert r.status_code == 200
     caps = set(r.json()["capabilities"])
-    assert caps == {"audit:read", "audit:export", "analytics:read", "user:manage"}
+    assert caps == {
+        "audit:read",
+        "audit:export",
+        "analytics:read",
+        "user:manage",
+        "compliance:purge",
+    }
 
 
 # ---------------------------------------------------------------------------

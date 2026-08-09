@@ -137,6 +137,24 @@ class AuditStoreNotImmutableError(ApiError):
     message = "Audit store does not enforce bucket lock (WORM)"
 
 
+class AuditWindowTooWideError(ApiError):
+    code = ErrorCode.AUDIT_WINDOW_TOO_WIDE
+    status_code = 422
+    message = "Audit query window exceeds the maximum of 92 days"
+
+
+class PatientNotFoundError(ApiError):
+    code = ErrorCode.PATIENT_NOT_FOUND
+    status_code = 404
+    message = "Patient not found"
+
+
+class ErasureConfirmationMismatchError(ApiError):
+    code = ErrorCode.ERASURE_CONFIRMATION_MISMATCH
+    status_code = 422
+    message = "Erasure confirmation reference does not match the patient"
+
+
 # -- envelope ----------------------------------------------------------------
 def _make_error_body(
     code: ErrorCode,

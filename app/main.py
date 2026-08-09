@@ -68,6 +68,9 @@ def create_app() -> FastAPI:
     register_handlers(app)
 
     # -- routers -------------------------------------------------------------
+    from app.api.v1.routers.admin import router as admin_router
+    from app.api.v1.routers.analytics import router as analytics_router
+    from app.api.v1.routers.audit import router as audit_router
     from app.api.v1.routers.auth import router as auth_router
     from app.api.v1.routers.dictation import router as dictation_router
     from app.api.v1.routers.findings import router as findings_router
@@ -86,6 +89,9 @@ def create_app() -> FastAPI:
     app.include_router(findings_router, prefix="/api/v1")
     app.include_router(dictation_router, prefix="/api/v1")
     app.include_router(preprocessing_router, prefix="/api/v1")
+    app.include_router(admin_router, prefix="/api/v1")
+    app.include_router(audit_router, prefix="/api/v1")
+    app.include_router(analytics_router, prefix="/api/v1")
     app.include_router(dicomweb_router)
 
     return app

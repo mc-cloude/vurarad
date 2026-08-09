@@ -45,5 +45,5 @@ asyncio_default_fixture_loop_scope = "function"
 addopts = "-v --tb=short"
 
 [[tool.mypy.overrides]]
-module = ["google.cloud", "google.cloud.*", "google.api_core", "google.api_core.*", "boto3", "botocore.*"]
+module = ["google.cloud", "google.cloud.*", "google.api_core", "google.api_core.*", "boto3", "botocore.*", "firebase_admin", "firebase_admin.*"]
 ignore_missing_imports = true

@@ -38,6 +38,7 @@ def test_admin_capabilities() -> None:
             Capability.AUDIT_EXPORT,
             Capability.ANALYTICS_READ,
             Capability.USER_MANAGE,
+            Capability.COMPLIANCE_PURGE,
         }
     )
 
@@ -110,3 +111,25 @@ def test_has_capability_true_false() -> None:
 def test_is_phi_capability() -> None:
     assert is_phi_capability(Capability.STUDY_READ) is True
     assert is_phi_capability(Capability.AUDIT_READ) is False
+
+
+# ---------------------------------------------------------------------------
+# Administration capabilities (WP7)
+# ---------------------------------------------------------------------------
+def test_admin_holds_compliance_purge() -> None:
+    """Admin performs erasure (right-to-be-forgotten) — a compliance action
+    that returns only counts, never PHI.  It is therefore NOT a PHI capability."""
+    assert has_capability(Role.ADMIN, Capability.COMPLIANCE_PURGE) is True
+    assert is_phi_capability(Capability.COMPLIANCE_PURGE) is False
+
+
+def test_radiologist_lacks_admin_capabilities() -> None:
+    """Radiologist must not reach any admin/audit/analytics/erasure route."""
+    for cap in (
+        Capability.AUDIT_READ,
+        Capability.AUDIT_EXPORT,
+        Capability.ANALYTICS_READ,
+        Capability.USER_MANAGE,
+        Capability.COMPLIANCE_PURGE,
+    ):
+        assert has_capability(Role.RADIOLOGIST, cap) is False

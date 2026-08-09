@@ -237,3 +237,108 @@ def test_studies_routes_have_phi_capability_check() -> None:
         assert "_require" in names or "require_patient_identity_access" in names, (
             f"Route {method} {path} missing PHI capability check"
         )
+
+
+# ---------------------------------------------------------------------------
+# /api/v1/admin, /audit, /analytics route security (WP7)
+# ---------------------------------------------------------------------------
+def _admin_routes(app: FastAPI) -> list[tuple[str, str, APIRoute]]:
+    return [(m, p, r) for m, p, r in _collect_api_routes(app) if p.startswith("/api/v1/admin")]
+
+
+def _audit_routes(app: FastAPI) -> list[tuple[str, str, APIRoute]]:
+    return [(m, p, r) for m, p, r in _collect_api_routes(app) if p.startswith("/api/v1/audit")]
+
+
+def _analytics_routes(app: FastAPI) -> list[tuple[str, str, APIRoute]]:
+    return [
+        (m, p, r) for m, p, r in _collect_api_routes(app) if p.startswith("/api/v1/analytics")
+    ]
+
+
+def test_admin_route_count_is_four() -> None:
+    app = create_app()
+    assert len(_admin_routes(app)) == 4
+
+
+def test_audit_route_count_is_two() -> None:
+    app = create_app()
+    assert len(_audit_routes(app)) == 2
+
+
+def test_analytics_route_count_is_one() -> None:
+    app = create_app()
+    assert len(_analytics_routes(app)) == 1
+
+
+def test_admin_audit_analytics_routes_require_auth_and_mfa() -> None:
+    """Every admin/audit/analytics route carries get_current_user + require_mfa."""
+    app = create_app()
+    for method, path, route in [*_admin_routes(app), *_audit_routes(app), *_analytics_routes(app)]:
+        names = _dep_names(route)
+        assert "get_current_user" in names, f"Route {method} {path} missing get_current_user"
+        assert "require_mfa" in names, f"Route {method} {path} missing require_mfa"
+
+
+def test_admin_audit_analytics_routes_declare_one_capability() -> None:
+    """Every admin/audit/analytics route declares exactly one capability."""
+    app = create_app()
+    for method, path, route in [
+        *_admin_routes(app),
+        *_audit_routes(app),
+        *_analytics_routes(app),
+    ]:
+        caps = _require_capability_calls(route)
+        assert len(caps) == 1, (
+            f"Route {method} {path} declares {len(caps)} capabilities, expected 1"
+        )
+        cap = _extract_capability(caps[0])
+        assert cap is not None, f"Route {method} {path} capability closure empty"
+
+
+# Expected capability inventory for the WP7 routes.
+_WP7_CAPABILITIES: dict[tuple[str, str], str] = {
+    ("GET", "/api/v1/admin/users"): "user:manage",
+    ("POST", "/api/v1/admin/users/{uid}/role"): "user:manage",
+    ("POST", "/api/v1/admin/users/{uid}/disable"): "user:manage",
+    ("DELETE", "/api/v1/admin/patients/{patient_key}"): "compliance:purge",
+    ("GET", "/api/v1/audit"): "audit:read",
+    ("POST", "/api/v1/audit/exports"): "audit:export",
+    ("GET", "/api/v1/analytics/dashboard"): "analytics:read",
+}
+
+
+def test_wp7_route_capabilities_match_inventory() -> None:
+    """The declared capability matches the expected inventory for each WP7 route."""
+    from app.core.capabilities import Capability
+
+    app = create_app()
+    for method, path, route in [
+        *_admin_routes(app),
+        *_audit_routes(app),
+        *_analytics_routes(app),
+    ]:
+        cap = _extract_capability(_require_capability_calls(route)[0])
+        expected = _WP7_CAPABILITIES[(method, path)]
+        assert cap == Capability(expected), (
+            f"Route {method} {path} has capability {cap}, expected {expected}"
+        )
+
+
+def test_wp7_route_capabilities_denied_to_radiologist() -> None:
+    """Every capability required by a WP7 route is absent from the radiologist
+    role — so a radiologist gets 403 on every admin/audit route and on analytics
+    (acceptance criterion 13)."""
+    from app.core.capabilities import Role, has_capability
+
+    app = create_app()
+    for method, path, route in [
+        *_admin_routes(app),
+        *_audit_routes(app),
+        *_analytics_routes(app),
+    ]:
+        cap = _extract_capability(_require_capability_calls(route)[0])
+        assert cap is not None
+        assert has_capability(Role.RADIOLOGIST, cap) is False, (
+            f"Route {method} {path} requires {cap} which a radiologist must NOT hold"
+        )

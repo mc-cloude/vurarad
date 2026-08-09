@@ -54,3 +54,10 @@ class ErrorCode(StrEnum):
     # -- audit ---------------------------------------------------------------
     AUDIT_CHAIN_BROKEN = "AUDIT_CHAIN_BROKEN"
     AUDIT_STORE_NOT_IMMUTABLE = "AUDIT_STORE_NOT_IMMUTABLE"
+    AUDIT_WINDOW_TOO_WIDE = "AUDIT_WINDOW_TOO_WIDE"
+    AUDIT_VIEWED = "AUDIT_VIEWED"
+    AUDIT_EXPORTED = "AUDIT_EXPORTED"
+
+    # -- compliance / erasure ------------------------------------------------
+    PATIENT_NOT_FOUND = "PATIENT_NOT_FOUND"
+    ERASURE_CONFIRMATION_MISMATCH = "ERASURE_CONFIRMATION_MISMATCH"
