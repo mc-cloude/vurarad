@@ -137,6 +137,43 @@ class AuditStoreNotImmutableError(ApiError):
     message = "Audit store does not enforce bucket lock (WORM)"
 
 
+# -- report errors (WP5) -----------------------------------------------------
+class IdempotencyKeyRequiredError(ApiError):
+    code = ErrorCode.IDEMPOTENCY_KEY_REQUIRED
+    status_code = 400
+    message = "A non-empty Idempotency-Key header is required for this operation"
+
+
+class SecondFactorReassertionRequiredError(ApiError):
+    code = ErrorCode.SECOND_FACTOR_REASSERTION_REQUIRED
+    status_code = 403
+    message = "A fresh second-factor assertion is required for this operation"
+
+
+class SecondFactorAssertionReplayedError(ApiError):
+    code = ErrorCode.SECOND_FACTOR_ASSERTION_REPLAYED
+    status_code = 403
+    message = "The second-factor assertion has already been used"
+
+
+class AttestationRequiredError(ApiError):
+    code = ErrorCode.ATTESTATION_REQUIRED
+    status_code = 422
+    message = "An explicit attestation is required to sign this report"
+
+
+class InvalidReportTransitionError(ApiError):
+    code = ErrorCode.INVALID_REPORT_TRANSITION
+    status_code = 409
+    message = "This report status transition is not allowed"
+
+
+class ReportImmutableError(ApiError):
+    code = ErrorCode.REPORT_IMMUTABLE
+    status_code = 409
+    message = "A signed report is immutable"
+
+
 # -- envelope ----------------------------------------------------------------
 def _make_error_body(
     code: ErrorCode,

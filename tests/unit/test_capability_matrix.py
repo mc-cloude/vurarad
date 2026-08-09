@@ -110,3 +110,39 @@ def test_has_capability_true_false() -> None:
 def test_is_phi_capability() -> None:
     assert is_phi_capability(Capability.STUDY_READ) is True
     assert is_phi_capability(Capability.AUDIT_READ) is False
+
+
+# ---------------------------------------------------------------------------
+# Report capability separation (WP5 — acceptance criteria 12-13)
+# ---------------------------------------------------------------------------
+def test_radiologist_has_all_report_capabilities() -> None:
+    """Radiologist holds REPORT_READ/WRITE/SIGN/ADDENDUM."""
+    caps = ROLE_CAPABILITIES[Role.RADIOLOGIST]
+    assert Capability.REPORT_READ in caps
+    assert Capability.REPORT_WRITE in caps
+    assert Capability.REPORT_SIGN in caps
+    assert Capability.REPORT_ADDENDUM in caps
+
+
+def test_viewer_cannot_write_or_sign_reports() -> None:
+    """Viewer has REPORT_READ only — no write/sign/addendum."""
+    caps = ROLE_CAPABILITIES[Role.VIEWER]
+    assert Capability.REPORT_READ in caps
+    assert Capability.REPORT_WRITE not in caps
+    assert Capability.REPORT_SIGN not in caps
+    assert Capability.REPORT_ADDENDUM not in caps
+
+
+def test_admin_has_no_report_capabilities() -> None:
+    """Admin has zero report capabilities (separation of duties)."""
+    caps = ROLE_CAPABILITIES[Role.ADMIN]
+    assert Capability.REPORT_READ not in caps
+    assert Capability.REPORT_WRITE not in caps
+    assert Capability.REPORT_SIGN not in caps
+    assert Capability.REPORT_ADDENDUM not in caps
+
+
+def test_report_delete_not_assigned_to_any_role() -> None:
+    """REPORT_DELETE is defined but intentionally unassigned (legal hold)."""
+    for role in Role:
+        assert Capability.REPORT_DELETE not in ROLE_CAPABILITIES[role]

@@ -194,11 +194,14 @@ def test_no_route_path_contains_direct_identifier_param() -> None:
 # /api/v1/studies/* route security (WP4 — §3.3–3.6 acceptance criteria 11–15)
 # ---------------------------------------------------------------------------
 def _studies_routes(app: FastAPI) -> list[tuple[str, str, APIRoute]]:
-    """Filter to /api/v1/studies routes only (excluding WP12 sub-resources)."""
+    """Filter to /api/v1/studies routes only (excluding WP12 + WP5 sub-resources)."""
     return [
         (m, p, r)
         for m, p, r in _collect_api_routes(app)
-        if p.startswith("/api/v1/studies") and "/findings" not in p and "/preprocessing" not in p
+        if p.startswith("/api/v1/studies")
+        and "/findings" not in p
+        and "/preprocessing" not in p
+        and "/reports" not in p
     ]
 
 
@@ -236,4 +239,69 @@ def test_studies_routes_have_phi_capability_check() -> None:
         names = _dep_names(route)
         assert "_require" in names or "require_patient_identity_access" in names, (
             f"Route {method} {path} missing PHI capability check"
+        )
+
+
+# ---------------------------------------------------------------------------
+# /api/v1/reports/* + POST /studies/{studyId}/reports route security (WP5)
+# ---------------------------------------------------------------------------
+def _reports_routes(app: FastAPI) -> list[tuple[str, str, APIRoute]]:
+    """Filter to the seven report routes (WP5)."""
+    return [
+        (m, p, r)
+        for m, p, r in _collect_api_routes(app)
+        if p.startswith("/api/v1/reports") or p.startswith("/api/v1/studies") and "/reports" in p
+    ]
+
+
+# Expected capability per report route (method, path) → capability string
+_REPORT_CAPABILITIES: dict[tuple[str, str], str] = {
+    ("POST", "/api/v1/studies/{study_id}/reports"): "study:write",
+    ("GET", "/api/v1/reports/{report_id}"): "report:read",
+    ("PATCH", "/api/v1/reports/{report_id}"): "report:write",
+    ("POST", "/api/v1/reports/{report_id}/sign"): "report:sign",
+    ("POST", "/api/v1/reports/{report_id}/addenda"): "report:write",
+    ("GET", "/api/v1/reports/{report_id}/versions"): "report:read",
+    ("GET", "/api/v1/reports/{report_id}/versions/{version}"): "report:read",
+}
+
+
+def test_reports_route_count_is_seven() -> None:
+    """The reports package exposes exactly seven routes (WP5)."""
+    app = create_app()
+    routes = _reports_routes(app)
+    assert len(routes) == 7, f"Expected 7 report routes, got {len(routes)}"
+
+
+def test_reports_routes_require_auth_and_mfa() -> None:
+    """Every report route must carry get_current_user and require_mfa."""
+    app = create_app()
+    for method, path, route in _reports_routes(app):
+        names = _dep_names(route)
+        assert "get_current_user" in names, f"Route {method} {path} missing get_current_user"
+        assert "require_mfa" in names, f"Route {method} {path} missing require_mfa"
+
+
+def test_reports_routes_have_phi_capability_check() -> None:
+    """Every report route must carry a require_phi_capability (_require closure)."""
+    app = create_app()
+    for method, path, route in _reports_routes(app):
+        caps = _require_capability_calls(route)
+        assert len(caps) == 1, (
+            f"Route {method} {path} declares {len(caps)} capabilities, expected 1"
+        )
+
+
+def test_reports_route_capabilities_match_inventory() -> None:
+    """The declared capability must match the expected inventory."""
+    from app.core.capabilities import Capability
+
+    app = create_app()
+    for method, path, route in _reports_routes(app):
+        caps = _require_capability_calls(route)
+        cap = _extract_capability(caps[0])
+        expected = _REPORT_CAPABILITIES.get((method, path))
+        assert expected is not None, f"Route {method} {path} not in inventory"
+        assert cap == Capability(expected), (
+            f"Route {method} {path} has capability {cap}, expected {expected}"
         )
