@@ -1,0 +1,2382 @@
+{
+  "version": 1,
+  "font": "DejaVuSans-Bold",
+  "images": [
+    {
+      "id": "us-acmeultrasound-01",
+      "modality": "US",
+      "manufacturer": "AcmeUltrasound",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "John Doe",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:12345",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1980-01-15",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "us-acmeultrasound-02",
+      "modality": "US",
+      "manufacturer": "AcmeUltrasound",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Jane Smith",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:67890",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1975-03-22",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "us-acmeultrasound-03",
+      "modality": "US",
+      "manufacturer": "AcmeUltrasound",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Robert Brown",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:54321",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1990-11-08",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "us-sonixpro-01",
+      "modality": "US",
+      "manufacturer": "SonixPro",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "John Doe",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:12345",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1980-01-15",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "us-sonixpro-02",
+      "modality": "US",
+      "manufacturer": "SonixPro",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Jane Smith",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:67890",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1975-03-22",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "us-sonixpro-03",
+      "modality": "US",
+      "manufacturer": "SonixPro",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Robert Brown",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:54321",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1990-11-08",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "sc-captureco-01",
+      "modality": "SC",
+      "manufacturer": "CaptureCo",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "John Doe",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:12345",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1980-01-15",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "sc-captureco-02",
+      "modality": "SC",
+      "manufacturer": "CaptureCo",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Jane Smith",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:67890",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1975-03-22",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "sc-captureco-03",
+      "modality": "SC",
+      "manufacturer": "CaptureCo",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Robert Brown",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:54321",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1990-11-08",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "sc-generalimaging-01",
+      "modality": "SC",
+      "manufacturer": "GeneralImaging",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "John Doe",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:12345",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1980-01-15",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "sc-generalimaging-02",
+      "modality": "SC",
+      "manufacturer": "GeneralImaging",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Jane Smith",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:67890",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1975-03-22",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "sc-generalimaging-03",
+      "modality": "SC",
+      "manufacturer": "GeneralImaging",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Robert Brown",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:54321",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1990-11-08",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "ot-othermod-01",
+      "modality": "OT",
+      "manufacturer": "OtherMod",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "John Doe",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:12345",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1980-01-15",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "ot-othermod-02",
+      "modality": "OT",
+      "manufacturer": "OtherMod",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Jane Smith",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:67890",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1975-03-22",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "ot-othermod-03",
+      "modality": "OT",
+      "manufacturer": "OtherMod",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Robert Brown",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:54321",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1990-11-08",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "ot-misccorp-01",
+      "modality": "OT",
+      "manufacturer": "MiscCorp",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "John Doe",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:12345",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1980-01-15",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "ot-misccorp-02",
+      "modality": "OT",
+      "manufacturer": "MiscCorp",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Jane Smith",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:67890",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1975-03-22",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "ot-misccorp-03",
+      "modality": "OT",
+      "manufacturer": "MiscCorp",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Robert Brown",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:54321",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1990-11-08",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "xc-xraycapture-01",
+      "modality": "XC",
+      "manufacturer": "XrayCapture",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "John Doe",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:12345",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1980-01-15",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "xc-xraycapture-02",
+      "modality": "XC",
+      "manufacturer": "XrayCapture",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Jane Smith",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:67890",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1975-03-22",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "xc-xraycapture-03",
+      "modality": "XC",
+      "manufacturer": "XrayCapture",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Robert Brown",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:54321",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1990-11-08",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "xc-filmscan-01",
+      "modality": "XC",
+      "manufacturer": "FilmScan",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "John Doe",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:12345",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1980-01-15",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "xc-filmscan-02",
+      "modality": "XC",
+      "manufacturer": "FilmScan",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Jane Smith",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:67890",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1975-03-22",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "xc-filmscan-03",
+      "modality": "XC",
+      "manufacturer": "FilmScan",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Robert Brown",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:54321",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1990-11-08",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "cr-crvendor-01",
+      "modality": "CR",
+      "manufacturer": "CRVendor",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "John Doe",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:12345",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1980-01-15",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "cr-crvendor-02",
+      "modality": "CR",
+      "manufacturer": "CRVendor",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Jane Smith",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:67890",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1975-03-22",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "cr-crvendor-03",
+      "modality": "CR",
+      "manufacturer": "CRVendor",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Robert Brown",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:54321",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1990-11-08",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "cr-xraydigital-01",
+      "modality": "CR",
+      "manufacturer": "XrayDigital",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "John Doe",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:12345",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1980-01-15",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "cr-xraydigital-02",
+      "modality": "CR",
+      "manufacturer": "XrayDigital",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Jane Smith",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:67890",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1975-03-22",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "cr-xraydigital-03",
+      "modality": "CR",
+      "manufacturer": "XrayDigital",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Robert Brown",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:54321",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1990-11-08",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "dx-dxsystems-01",
+      "modality": "DX",
+      "manufacturer": "DXSystems",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "John Doe",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:12345",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1980-01-15",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "dx-dxsystems-02",
+      "modality": "DX",
+      "manufacturer": "DXSystems",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Jane Smith",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:67890",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1975-03-22",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "dx-dxsystems-03",
+      "modality": "DX",
+      "manufacturer": "DXSystems",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Robert Brown",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:54321",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1990-11-08",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "dx-flatpanel-01",
+      "modality": "DX",
+      "manufacturer": "FlatPanel",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "John Doe",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:12345",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1980-01-15",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "dx-flatpanel-02",
+      "modality": "DX",
+      "manufacturer": "FlatPanel",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Jane Smith",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:67890",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1975-03-22",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "dx-flatpanel-03",
+      "modality": "DX",
+      "manufacturer": "FlatPanel",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Robert Brown",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:54321",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1990-11-08",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "mg-mamotech-01",
+      "modality": "MG",
+      "manufacturer": "MamoTech",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "John Doe",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:12345",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1980-01-15",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "mg-mamotech-02",
+      "modality": "MG",
+      "manufacturer": "MamoTech",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Jane Smith",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:67890",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1975-03-22",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "mg-mamotech-03",
+      "modality": "MG",
+      "manufacturer": "MamoTech",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Robert Brown",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:54321",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1990-11-08",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "mg-breastscan-01",
+      "modality": "MG",
+      "manufacturer": "BreastScan",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "John Doe",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:12345",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1980-01-15",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "mg-breastscan-02",
+      "modality": "MG",
+      "manufacturer": "BreastScan",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Jane Smith",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:67890",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1975-03-22",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "mg-breastscan-03",
+      "modality": "MG",
+      "manufacturer": "BreastScan",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Robert Brown",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:54321",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1990-11-08",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "ct-ctscanco-01",
+      "modality": "CT",
+      "manufacturer": "CTScanCo",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "John Doe",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:12345",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1980-01-15",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "ct-ctscanco-02",
+      "modality": "CT",
+      "manufacturer": "CTScanCo",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Jane Smith",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:67890",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1975-03-22",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "ct-ctscanco-03",
+      "modality": "CT",
+      "manufacturer": "CTScanCo",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Robert Brown",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:54321",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1990-11-08",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "ct-tomovendor-01",
+      "modality": "CT",
+      "manufacturer": "TomoVendor",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "John Doe",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:12345",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1980-01-15",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "ct-tomovendor-02",
+      "modality": "CT",
+      "manufacturer": "TomoVendor",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Jane Smith",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:67890",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1975-03-22",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "ct-tomovendor-03",
+      "modality": "CT",
+      "manufacturer": "TomoVendor",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Robert Brown",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:54321",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1990-11-08",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "mr-mriworks-01",
+      "modality": "MR",
+      "manufacturer": "MRIWorks",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "John Doe",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:12345",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1980-01-15",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "mr-mriworks-02",
+      "modality": "MR",
+      "manufacturer": "MRIWorks",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Jane Smith",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:67890",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1975-03-22",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "mr-mriworks-03",
+      "modality": "MR",
+      "manufacturer": "MRIWorks",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Robert Brown",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:54321",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1990-11-08",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "mr-magnetco-01",
+      "modality": "MR",
+      "manufacturer": "MagnetCo",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "John Doe",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:12345",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1980-01-15",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "mr-magnetco-02",
+      "modality": "MR",
+      "manufacturer": "MagnetCo",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Jane Smith",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:67890",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1975-03-22",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    },
+    {
+      "id": "mr-magnetco-03",
+      "modality": "MR",
+      "manufacturer": "MagnetCo",
+      "width": 256,
+      "height": 96,
+      "regions": [
+        {
+          "text": "Robert Brown",
+          "x": 8,
+          "y": 8,
+          "is_phi": true,
+          "kind": "PATIENT"
+        },
+        {
+          "text": "MRN:54321",
+          "x": 8,
+          "y": 28,
+          "is_phi": true,
+          "kind": "ID"
+        },
+        {
+          "text": "1990-11-08",
+          "x": 8,
+          "y": 48,
+          "is_phi": true,
+          "kind": "DATE"
+        },
+        {
+          "text": "LEFT",
+          "x": 180,
+          "y": 8,
+          "is_phi": false,
+          "kind": "LATERALITY"
+        },
+        {
+          "text": "15.2 cm",
+          "x": 180,
+          "y": 28,
+          "is_phi": false,
+          "kind": "MEASUREMENT"
+        }
+      ]
+    }
+  ]
+}
