@@ -21,6 +21,12 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt ruff mypy
+      - name: diagnostics — package versions
+        run: |
+          pip list 2>&1 | grep -iE "mypy|ruff|numpy|pydicom|pydantic|fastapi|pillow|pytest"
+          pip show mypy 2>&1 | head -5
+      - name: diagnostics — import check
+        run: python -c "import app; print('import OK')" 2>&1 || true
       - name: ruff check
         run: ruff check app/ tests/
       - name: ruff format --check
@@ -57,8 +63,10 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt pytest pytest-asyncio pytest-cov httpx
+      - name: diagnostics — import check
+        run: python -c "import app; print('import OK')" 2>&1 || true
       - name: unit tests
-        run: pytest tests/unit -q
+        run: pytest tests/unit -q --tb=long
       - name: integration tests + coverage
         run: pytest tests/ -q --cov=app --cov-fail-under=85
 
