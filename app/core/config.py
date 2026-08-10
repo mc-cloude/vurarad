@@ -81,6 +81,10 @@ class Settings(BaseSettings):
     # -- environment ---------------------------------------------------------
     environment: Environment = Environment.development
     log_level: LogLevel = LogLevel.INFO
+    # ``"cloud"`` (Firestore + GCS + Vertex AI) or ``"onprem"`` (PostgreSQL +
+    # MinIO + local OIDC + CPU segmentation).  Drives metadata-backend
+    # selection (:func:`build_metadata_store`) and the residency guard below.
+    hosting: Literal["cloud", "onprem"] = "cloud"
 
     # -- hosting -------------------------------------------------------------
     gcp_project_id: str
@@ -105,6 +109,23 @@ class Settings(BaseSettings):
     minio_secret_key: str | None = None
     minio_region: str = ""
     minio_secure: bool = True
+
+    # -- PostgreSQL (on-prem metadata backend) -------------------------------
+    # Connection string for the on-prem PostgreSQL metadata store, e.g.
+    # ``postgres://vurarad:secret@postgres:5432/vurarad``.  Required when
+    # ``hosting == "onprem"``; ignored by the cloud tier.
+    postgres_dsn: str | None = None
+
+    # -- Local OIDC (on-prem auth) -------------------------------------------
+    # Issuer and audience for the local OIDC provider (e.g. Keycloak).  The
+    # on-prem tier verifies ID tokens offline — no JWKS is fetched at runtime.
+    # ``oidc_jwks_path`` points to a JWKS file provisioned on disk (RS256);
+    # ``oidc_hmac_secret`` is a shared secret for HS256.  At least one key
+    # source is required when ``hosting == "onprem"``; ignored by the cloud tier.
+    oidc_issuer: str | None = None
+    oidc_audience: str | None = None
+    oidc_jwks_path: str | None = None
+    oidc_hmac_secret: str | None = None
 
     # -- auth ----------------------------------------------------------------
     firebase_project_id: str
@@ -155,9 +176,10 @@ class Settings(BaseSettings):
         if self.environment == Environment.production and self.firestore_emulator_host is not None:
             raise ValueError("FIRESTORE_EMULATOR_HOST must be None when ENVIRONMENT=production")
 
-        # Region must be in the Vertex AI allowlist
+        # Region must be in the Vertex AI allowlist (cloud tier only — on-prem
+        # uses gcp_region as an opaque site label, never for a cloud call).
         region = self.gcp_region.lower()
-        if region not in VERTEX_ALLOWLIST:
+        if self.hosting != "onprem" and region not in VERTEX_ALLOWLIST:
             raise ValueError(
                 f"GCP_REGION={self.gcp_region} is not in the Vertex AI "
                 f"allowlist. Supported: {sorted(VERTEX_ALLOWLIST)}"
@@ -169,17 +191,42 @@ class Settings(BaseSettings):
             if lookup == Environment.production:
                 self.vertex_location = self.gcp_region
 
-        # Residency / segmentation region guard
+        # Residency / segmentation region guard (cloud tier only — on-prem
+        # segmentation runs locally and must not target a cloud region).
         if not self.segmentation_region:
             self.segmentation_region = self.gcp_region
         if (
             self.residency_policy == ResidencyPolicy.africa
+            and self.hosting != "onprem"
             and self.segmentation_region.lower() not in VERTEX_ALLOWLIST
         ):
             raise ValueError(
                 f"segmentation_region={self.segmentation_region} not in "
                 f"Vertex AI allowlist for residency_policy=africa"
             )
+
+        # On-prem hosting guard — residency criterion: on-prem must NOT call a
+        # cloud region for AI/segmentation, must use MinIO for objects, and must
+        # store metadata in PostgreSQL.  No outbound cloud dependency is valid.
+        if self.hosting == "onprem":
+            if self.segmentation_region.lower() in VERTEX_ALLOWLIST:
+                raise ValueError(
+                    f"segmentation_region={self.segmentation_region} is a cloud "
+                    f"Vertex region; on-prem hosting must not call a cloud region "
+                    f"(set segmentation_region to a local label such as 'local')"
+                )
+            if self.storage_backend != "minio":
+                raise ValueError("storage_backend must be 'minio' when hosting='onprem'")
+            if not self.postgres_dsn:
+                raise ValueError("postgres_dsn is required when hosting='onprem'")
+            if not self.oidc_issuer:
+                raise ValueError("oidc_issuer is required when hosting='onprem'")
+            if not self.oidc_audience:
+                raise ValueError("oidc_audience is required when hosting='onprem'")
+            if not self.oidc_jwks_path and not self.oidc_hmac_secret:
+                raise ValueError(
+                    "oidc_jwks_path or oidc_hmac_secret is required when hosting='onprem'"
+                )
 
         # MinIO backend validation
         if self.storage_backend == "minio":
@@ -206,6 +253,11 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         return self.environment == Environment.production
+
+    @property
+    def is_onprem(self) -> bool:
+        """``True`` for the on-prem tier (PostgreSQL + MinIO + local OIDC)."""
+        return self.hosting == "onprem"
 
     def assertion_fingerprint(self) -> str:
         """Deterministic fingerprint of security-critical values for the audit

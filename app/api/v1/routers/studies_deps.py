@@ -21,7 +21,7 @@ from app.core.auth import AuthenticatedUser, get_current_user, require_mfa
 from app.core.capabilities import Capability, Role, has_capability, is_phi_capability
 from app.core.config import Settings
 from app.models.study import ViewerScope
-from app.repositories.base import DocumentStore, FirestoreDocumentStore
+from app.repositories.base import DocumentStore, build_metadata_store
 from app.repositories.patient_repo import PatientRepository
 from app.repositories.study_repo import StudyRepository
 from app.services.audit_service import AuditMirror, AuditService
@@ -109,7 +109,7 @@ async def get_document_store(request: Request) -> DocumentStore:
     store = getattr(request.app.state, "document_store", None)
     if store is None:
         settings: Settings = request.app.state.settings
-        store = FirestoreDocumentStore.from_settings(settings)
+        store = build_metadata_store(settings)
         request.app.state.document_store = store
     return store
 

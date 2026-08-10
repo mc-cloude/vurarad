@@ -1,0 +1,25 @@
+# Caddy reverse proxy for the on-prem bundle.
+#
+# Listens on :8080 (HTTP).  For production with TLS, replace the address
+# with the hospital's domain and provide certificates via the ``tls``
+# directive or the Caddy ``acme`` integration (requires DNS-01 challenge
+# if outbound HTTPS is blocked — or use internal TLS with self-signed certs).
+
+:8080 {
+	# Proxy all API and DICOMweb traffic to the api container.
+	reverse_proxy api:8080
+
+	# Security headers
+	header {
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		# No CSP here — the SPA ships its own; add when the frontend is deployed.
+	}
+
+	# Access log
+	log {
+		output stdout
+		format json
+	}
+}
