@@ -1,0 +1,74 @@
+# Nightly — slow tests, dependency audit, image re-scan, audit-chain verification.
+# Plan reference: backend-plan.md §10.5
+#
+# The image does not change overnight, but the vulnerability database does.
+# A CVE published after merge is found here without waiting for the next PR.
+name: Nightly
+
+on:
+  schedule:
+    - cron: "0 2 * * *" # 02:00 UTC daily
+  workflow_dispatch: # manual trigger for testing
+
+permissions:
+  contents: read
+
+jobs:
+  slow-tests:
+    runs-on: ubuntu-latest
+    services:
+      firestore:
+        image: mtlynch/firestore-emulator
+        ports:
+          - 8200:8200
+        env:
+          FIRESTORE_PROJECT_ID: vurarad-test
+          PORT: 8200
+    env:
+      FIRESTORE_EMULATOR_HOST: localhost:8200
+      FIRESTORE_PROJECT_ID: vurarad-test
+      GCP_PROJECT_ID: vurarad-test
+      GCP_REGION: us-central1
+      PIXEL_BUCKET_NAME: pixels
+      AUDIT_BUCKET_NAME: audit
+      FIREBASE_PROJECT_ID: vurarad-test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt pytest pytest-asyncio pytest-cov httpx
+      # Full suite including @pytest.mark.slow benchmarks (ingest, 500-object study).
+      - name: Full test suite (including slow)
+        run: pytest -q --cov=app --cov-fail-under=85
+
+  dependency-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install pip-audit -r requirements.txt
+      - name: pip-audit (fixable HIGH/CRITICAL only)
+        run: pip-audit --strict --desc
+
+  image-rescan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: vurarad-api:nightly
+      - name: Grype scan
+        uses: anchore/scan-action@v3
+        with:
+          image: vurarad-api:nightly
+          fail-build: true
+          severity-cutoff: high
