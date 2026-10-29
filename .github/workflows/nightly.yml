@@ -6,8 +6,7 @@
 name: Nightly
 
 on:
-  schedule:
-    - cron: "0 2 * * *" # 02:00 UTC daily
+  # Manual only (owner 2026-10-30: no billed hosted minutes); was: schedule, workflow_dispatch.
   workflow_dispatch: # manual trigger for testing
 
 permissions:
