@@ -45,6 +45,15 @@ def create_app() -> FastAPI:
     # -- settings on app.state for DI ---------------------------------------
     app.state.settings = settings
 
+    # -- token verifier ------------------------------------------------------
+    # On-prem: LocalOidcVerifier verifies OIDC ID tokens offline (no outbound
+    # internet).  The cloud tier wires its verifier separately (Identity
+    # Platform); tests override via ``app.state.token_verifier``.
+    if settings.is_onprem:
+        from app.core.auth_local import LocalOidcVerifier
+
+        app.state.token_verifier = LocalOidcVerifier.from_settings(settings)
+
     # -- CORS -----------------------------------------------------------------
     if settings.cors_origins:
         app.add_middleware(

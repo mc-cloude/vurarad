@@ -15,7 +15,7 @@ from fastapi import Depends, Request
 from app.core.config import Settings
 from app.core.deps import get_object_store
 from app.models.audit import AuditEvent
-from app.repositories.base import DocumentStore, FirestoreDocumentStore
+from app.repositories.base import DocumentStore, build_metadata_store
 from app.repositories.ingest_job_repo import IngestJobRepository
 from app.repositories.series_repo import SeriesRepository
 from app.services.audit_service import AuditMirror, AuditService
@@ -49,7 +49,7 @@ async def get_document_store(request: Request) -> DocumentStore:
     store = getattr(request.app.state, "document_store", None)
     if store is None:
         settings: Settings = request.app.state.settings
-        store = FirestoreDocumentStore.from_settings(settings)
+        store = build_metadata_store(settings)
         request.app.state.document_store = store
     return store
 

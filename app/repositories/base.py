@@ -1,10 +1,14 @@
-"""Document-store abstraction for the repository layer.
+"""Metadata-store abstraction for the repository layer.
 
-Backed by Firestore in production and an in-memory store in tests.  Repositories
-depend on :class:`DocumentStore` only, never on a backend SDK directly — the same
-seam ``ObjectStore`` provides for object storage.  ``create`` is atomic: it
-succeeds only when the document is absent, which is what makes the ingest lease
-race-free.
+``MetadataStore`` is the repository-layer equivalent of ``ObjectStore``: a
+single ``Protocol`` every backend must satisfy so the rest of the application
+depends on the seam, never on a backend SDK.  Backed by Firestore in the cloud
+tier and PostgreSQL on-prem; an in-memory store is used in unit tests.
+``create`` is atomic — it succeeds only when the document is absent — which is
+what makes the ingest lease race-free.
+
+``DocumentStore`` is retained as a backward-compatible alias: existing
+repositories import it, and it is the very same protocol object.
 """
 
 from __future__ import annotations
@@ -14,8 +18,13 @@ from typing import Any, Protocol, runtime_checkable
 
 
 @runtime_checkable
-class DocumentStore(Protocol):
-    """Backend-agnostic document store.  All methods are ``async``."""
+class MetadataStore(Protocol):
+    """Backend-agnostic metadata store.  All methods are ``async``.
+
+    The contract every backend (Firestore, PostgreSQL, in-memory) must satisfy.
+    A single parametrised contract suite asserts the two production backends
+    behave identically (``tests/integration/test_metadata_store_contract.py``).
+    """
 
     async def get(self, collection: str, doc_id: str) -> dict[str, Any] | None:
         """Return the document, or ``None`` if it does not exist."""
@@ -46,6 +55,12 @@ class DocumentStore(Protocol):
     ) -> list[tuple[str, dict[str, Any]]]:
         """Return ``(doc_id, doc)`` pairs matching the equality filters."""
         ...
+
+
+# Backward-compatible alias — existing repositories import ``DocumentStore``.
+# It resolves to the same protocol, so annotations stay identical.  (Used only
+# as a type annotation; runtime ``isinstance`` checks use ``MetadataStore``.)
+type DocumentStore = MetadataStore
 
 
 def _match(doc: dict[str, Any], field: str, op: str, value: Any) -> bool:
@@ -172,3 +187,26 @@ class FirestoreDocumentStore:
         q = q.limit(limit)
         snaps = await q.get()
         return [(snap.id, dict(snap.to_dict() or {})) for snap in snaps]
+
+
+# ---------------------------------------------------------------------------
+# Factory — ``build_metadata_store(settings)`` mirrors ``build_object_store``.
+#
+# Backend imports are lazy so a Firestore-only cloud deployment never imports
+# the PostgreSQL driver (and an on-prem deployment never imports the Firestore
+# SDK).  Selection keys off ``settings.hosting``: ``"onprem"`` → PostgreSQL,
+# anything else → Firestore.
+# ---------------------------------------------------------------------------
+def build_metadata_store(settings: Any) -> MetadataStore:
+    """Return the configured ``MetadataStore`` for the current settings.
+
+    On-prem (``hosting == "onprem"``) returns a PostgreSQL-backed store; the
+    cloud tier returns a Firestore-backed store.  Imports are deferred so each
+    deployment only needs the driver for its own backend.
+    """
+    if getattr(settings, "hosting", "cloud") == "onprem":
+        from app.repositories.postgres_impl.store import PostgresMetadataStore
+
+        return PostgresMetadataStore.from_settings(settings)
+
+    return FirestoreDocumentStore.from_settings(settings)
