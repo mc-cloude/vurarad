@@ -1,0 +1,200 @@
+# Quarterly restore drill — proves the recovery path by executing it (§5.6.1).
+# Plan reference: backend-plan.md §5.6.1, acceptance criterion 12
+#
+# Manual dispatch only. It is elevated infra work: it runs as vurarad-tf@
+# (not vurarad-deploy@, which has no Firestore/Storage access — criterion 6),
+# so the WIF impersonation grant in infra/iam.tf is scoped to
+# attribute.event_name=workflow_dispatch. PR/push CI can never reach tf@.
+#
+# What it does, end to end:
+#   1. federate as vurarad-tf@ via WIF (no JSON key)
+#   2. find the latest nightly Firestore export in gs://vurarad-backup
+#   3. create a scratch Firestore database and import that export into it
+#   4. boot the currently-deployed (pinned) image against the scratch DB on a
+#      scratch Cloud Run service with --no-traffic (gcloud waits for /readyz,
+#      so success == the image boots against the restored data)
+#   5. run tests/integration/test_restore_smoke.py against the scratch DB
+#      (study/report counts, worklist index consistency, audit chain continuity)
+#   6. measure wall-clock RTO and append a row to docs/runbooks/restore-drill-log.md
+#   7. always tear down the scratch service + scratch database, even on failure
+#
+# RTO < 4 h is a pass; >= 4 h (or any step failing) is a finding. A drill that
+# is not executed does not close WP2 — a missing quarter is itself the finding
+# (§10.9). The drill covers import + redeploy + verification; the full RTO also
+# includes the CloudFront origin re-point and DICOM transfer back, estimated in
+# docs/runbooks/restore.md and not re-performed here because the smoke test
+# validates the Firestore restore, which is the part that can silently break.
+name: Restore drill
+
+on:
+  workflow_dispatch: # quarterly, human-triggered — never scheduled
+
+permissions:
+  contents: write # append the drill result to restore-drill-log.md
+  id-token: write # required for WIF + the OIDC token the creds file exchanges
+
+jobs:
+  restore-drill:
+    runs-on: ubuntu-latest
+    env:
+      GCP_REGION: us-central1
+      # Scratch resources are namespaced by run_id so concurrent/aborted drills
+      # cannot collide, and cleanup always targets this run's resources.
+      SCRATCH_DB: restore-drill-${{ github.run_id }}
+      SCRATCH_SVC: vurarad-api-restore-drill-${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # 1. Federate as vurarad-tf@ via WIF. The generated external-account
+      #    credentials file is reused by the smoke test (RESTORE_SMOKE_CREDS_PATH)
+      #    so it bypasses the fake service-account JSON conftest installs for
+      #    unit tests and connects to the scratch DB as the drill identity.
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: vurarad-tf@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
+          create_credentials_file: true
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Install test dependencies
+        run: pip install -r requirements.txt pytest pytest-asyncio httpx
+
+      # 2. Find the latest nightly Firestore export (YYYYMMDD-HHMMSS sorts
+      #    lexically == chronologically).
+      - id: export
+        name: Locate latest Firestore export
+        run: |
+          set -euo pipefail
+          LATEST="$(gcloud storage ls -d 'gs://vurarad-backup/firestore-exports/' | sort | tail -1)"
+          test -n "$LATEST" || { echo "No Firestore export found under gs://vurarad-backup/firestore-exports/" >&2; exit 1; }
+          LATEST="${LATEST%/}"
+          echo "Latest export: $LATEST"
+          echo "latest_export=$LATEST" >> "$GITHUB_ENV"
+
+      # 3. Create the scratch database and start the RTO clock — the restore
+      #    begins by standing up the recovery target.
+      - id: createdb
+        name: Create scratch Firestore database (RTO start)
+        run: |
+          set -euo pipefail
+          echo "RTO_START=$(date +%s)" >> "$GITHUB_ENV"
+          gcloud firestore databases create \
+            --database="$SCRATCH_DB" \
+            --location="$GCP_REGION" \
+            --project="${{ secrets.GCP_PROJECT_ID }}"
+
+      # 4. Import the latest export. Long-running; gcloud blocks until done.
+      - id: import
+        name: Import latest export into scratch database
+        timeout-minutes: 120
+        run: |
+          set -euo pipefail
+          gcloud firestore import "$latest_export" \
+            --database="$SCRATCH_DB" \
+            --project="${{ secrets.GCP_PROJECT_ID }}"
+
+      # 5. Boot the pinned image against the restored data. We deploy the image
+      #    the production service currently runs (its digest-pinned image) to a
+      #    scratch service with --no-traffic and FIRESTORE_DATABASE pointed at
+      #    the scratch DB. gcloud waits for the revision to become ready, i.e.
+      #    for the /readyz startup probe to pass — so a green deploy means the
+      #    image actually boots against the restored Firestore. The service runs
+      #    as vurarad-run@ (least-privilege runtime identity; tf@ holds
+      #    serviceAccountUser on it for this drill).
+      - id: deploy
+        name: Boot pinned image against scratch DB (--no-traffic)
+        timeout-minutes: 10
+        run: |
+          set -euo pipefail
+          PROJECT="${{ secrets.GCP_PROJECT_ID }}"
+          PROD_IMAGE="$(gcloud run services describe vurarad-api \
+            --region="$GCP_REGION" --project="$PROJECT" \
+            --format='value(template.containers[0].image)')"
+          echo "Pinned image: $PROD_IMAGE"
+          gcloud run deploy "$SCRATCH_SVC" \
+            --image="$PROD_IMAGE" \
+            --region="$GCP_REGION" --project="$PROJECT" \
+            --service-account="vurarad-run@$PROJECT.iam.gserviceaccount.com" \
+            --no-traffic --no-allow-unauthenticated --port=8080 \
+            --memory=512Mi --cpu=1 --concurrency=40 --timeout=300 \
+            --set-env-vars="GCP_PROJECT_ID=$PROJECT,GCP_REGION=$GCP_REGION,ENVIRONMENT=production,PIXEL_BUCKET_NAME=vurarad-dicom,AUDIT_BUCKET_NAME=vurarad-audit,QUARANTINE_BUCKET_NAME=vurarad-quarantine,FIREBASE_PROJECT_ID=$PROJECT,FIRESTORE_DATABASE=$SCRATCH_DB"
+
+      # 6. Verify the restored data. The smoke test connects directly to the
+      #    scratch DB with the WIF creds (RESTORE_SMOKE_CREDS_PATH) and asserts
+      #    the four invariants. continue-on-error so a failure is recorded as a
+      #    finding rather than aborting before the log is appended.
+      - id: smoke
+        name: Run restore smoke test against scratch DB
+        continue-on-error: true
+        env:
+          RESTORE_SMOKE_FIRESTORE_DB: ${{ env.SCRATCH_DB }}
+          RESTORE_SMOKE_CREDS_PATH: ${{ steps.auth.outputs.credentials_file_path }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        run: pytest tests/integration/test_restore_smoke.py -q
+
+      # 7. Measure RTO, determine pass/fail, and append a row to the drill log.
+      - id: record
+        name: Record RTO and result
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ -n "${RTO_START:-}" ]; then
+            RTO_MIN=$(( ( $(date +%s) - RTO_START ) / 60 ))
+          else
+            RTO_MIN=0
+          fi
+          # Pass iff every restore step succeeded AND RTO < 4 h (240 min).
+          IMPORT_OK="${{ steps.import.conclusion == 'success' }}"
+          DEPLOY_OK="${{ steps.deploy.conclusion == 'success' }}"
+          SMOKE_OK="${{ steps.smoke.conclusion == 'success' }}"
+          if [ "$IMPORT_OK" = "true" ] && [ "$DEPLOY_OK" = "true" ] && [ "$SMOKE_OK" = "true" ] && [ "$RTO_MIN" -lt 240 ]; then
+            RESULT="PASS"
+          else
+            RESULT="FAIL"
+          fi
+          echo "rto_min=$RTO_MIN" >> "$GITHUB_ENV"
+          echo "result=$RESULT" >> "$GITHUB_ENV"
+          echo "::notice::Restore drill $RESULT — RTO ${RTO_MIN}m (threshold 240m), run ${{ github.run_id }}"
+
+      - name: Append result to restore-drill-log.md
+        if: always()
+        run: |
+          set -euo pipefail
+          DATE="$(date -u +%Y-%m-%d)"
+          ROW="| ${DATE} | \`${{ github.sha }}\` | ${rto_min} | ${result} | ${{ github.run_id }} |"
+          echo "Appending row: $ROW"
+          echo "$ROW" >> docs/runbooks/restore-drill-log.md
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/runbooks/restore-drill-log.md
+          git commit -m "chore(ops): restore drill ${result} (RTO ${rto_min}m, run ${{ github.run_id }})"
+          git push
+
+      # 8. Always tear down — never leave a scratch database or service behind,
+      #    even if an earlier step failed. Best-effort: a cleanup error must not
+      #    mask the drill result recorded above.
+      - name: Destroy scratch Cloud Run service
+        if: always()
+        run: |
+          gcloud run services delete "$SCRATCH_SVC" \
+            --region="$GCP_REGION" --project="${{ secrets.GCP_PROJECT_ID }}" \
+            --quiet || true
+
+      - name: Destroy scratch Firestore database
+        if: always()
+        run: |
+          gcloud firestore databases delete \
+            --database="$SCRATCH_DB" --project="${{ secrets.GCP_PROJECT_ID }}" \
+            --quiet || true
+
+      # Fail the job (after recording + cleanup) if the drill did not pass, so
+      # the run is red and unmissable in the Actions list.
+      - name: Fail job on drill failure
+        if: always()
+        run: |
+          if [ "${result}" != "PASS" ]; then
+            echo "::error::Restore drill FAILED (RTO ${rto_min}m) — see docs/runbooks/restore-drill-log.md"
+            exit 1
+          fi
